@@ -1,0 +1,112 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "A user profile in the fitness app.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "User ID" },
+        "name": { "type": "string", "description": "User's display name" },
+        "email": { "type": "string", "format": "email", "description": "User's email address" },
+        "photoURL": { "type": "string", "description": "User's profile photo URL" },
+        "role": { "type": "string", "enum": ["user", "admin"], "description": "User role" },
+        "stats": {
+          "type": "object",
+          "properties": {
+            "totalWorkouts": { "type": "number" },
+            "totalMinutes": { "type": "number" },
+            "caloriesBurned": { "type": "number" }
+          }
+        },
+        "connectedApps": {
+          "type": "object",
+          "properties": {
+            "appleHealth": { "type": "boolean" },
+            "googleFit": { "type": "boolean" }
+          }
+        },
+        "personalDetails": {
+          "type": "object",
+          "properties": {
+            "age": { "type": "number" },
+            "weight": { "type": "number" },
+            "height": { "type": "number" },
+            "gender": { "type": "string" }
+          }
+        },
+        "fitnessGoals": { "type": "string" },
+        "experienceLevel": { "type": "string" },
+        "dietaryRestrictions": { "type": "string" },
+        "unlockedAchievements": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "name", "email", "role", "createdAt"]
+    },
+    "WorkoutLog": {
+      "title": "WorkoutLog",
+      "description": "A log of a completed workout.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "ID of the user who completed the workout" },
+        "title": { "type": "string", "description": "Title of the workout" },
+        "date": { "type": "string", "description": "Date of the workout (YYYY-MM-DD)" },
+        "duration": { "type": "string", "description": "Duration of the workout" },
+        "calories": { "type": "number", "description": "Calories burned" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "title", "date", "duration", "calories", "timestamp"]
+    },
+    "MealLog": {
+      "title": "MealLog",
+      "description": "A log of a consumed meal.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "ID of the user who consumed the meal" },
+        "name": { "type": "string", "description": "Name of the meal" },
+        "type": { "type": "string", "description": "Type of meal (e.g., Breakfast, Lunch)" },
+        "date": { "type": "string", "description": "Date of the meal (YYYY-MM-DD)" },
+        "calories": { "type": "number", "description": "Calories consumed" },
+        "protein": { "type": "number", "description": "Protein in grams" },
+        "carbs": { "type": "number", "description": "Carbs in grams" },
+        "fat": { "type": "number", "description": "Fat in grams" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "name", "type", "date", "calories", "protein", "carbs", "fat", "timestamp"]
+    },
+    "ExerciseLog": {
+      "title": "ExerciseLog",
+      "description": "A log of a specific exercise performed.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "ID of the user who performed the exercise" },
+        "exerciseName": { "type": "string", "description": "Name of the exercise" },
+        "weight": { "type": "number", "description": "Weight lifted" },
+        "reps": { "type": "number", "description": "Number of repetitions" },
+        "date": { "type": "string", "description": "Date of the exercise (YYYY-MM-DD)" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "exerciseName", "weight", "reps", "date", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "Stores user profiles and overall stats."
+    },
+    "/workouts/{workoutId}": {
+      "schema": { "$ref": "#/entities/WorkoutLog" },
+      "description": "Stores individual workout logs."
+    },
+    "/meals/{mealId}": {
+      "schema": { "$ref": "#/entities/MealLog" },
+      "description": "Stores individual meal logs."
+    },
+    "/exercises/{exerciseId}": {
+      "schema": { "$ref": "#/entities/ExerciseLog" },
+      "description": "Stores individual exercise logs."
+    }
+  }
+}

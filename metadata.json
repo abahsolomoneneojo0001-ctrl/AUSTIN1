@@ -1,0 +1,5 @@
+{
+  "name": "FitWithAustin",
+  "description": "A modern, professional fitness application with AI-generated workout plans, diet tracking, and a smart fitness coach.",
+  "requestFramePermissions": ["camera", "microphone", "geolocation"]
+}

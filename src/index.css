@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ff-bg: #000000;
+  --color-ff-surface: #1C1C1E;
+  --color-ff-text: #FFFFFF;
+  --color-ff-muted: #8E8E93;
+  --color-ff-primary: #A4FF2A;
+  --color-ff-secondary: #FA114F;
+  --color-ff-tertiary: #00E5FF;
+  --color-ff-quaternary: #FF9F0A;
+
+  --font-display: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+:root.light {
+  --color-ff-bg: #F2F2F7;
+  --color-ff-surface: #FFFFFF;
+  --color-ff-text: #000000;
+  --color-ff-muted: #8E8E93;
+  --color-ff-primary: #89D91D;
+  --color-ff-secondary: #D70015;
+  --color-ff-tertiary: #007AFF;
+  --color-ff-quaternary: #FF9500;
+}
+
+body {
+  background-color: var(--color-ff-bg);
+  color: var(--color-ff-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
