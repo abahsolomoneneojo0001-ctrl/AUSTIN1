@@ -9,12 +9,12 @@ import { collection, addDoc, serverTimestamp, doc, updateDoc, increment } from '
 import { format } from 'date-fns';
 
 const WORKOUTS = [
-  { id: 1, title: 'HIIT Cardio Blast', category: 'Cardio', duration: '30 Min', level: 'Intermediate', calories: 350, image: 'https://picsum.photos/seed/hiit/600/400' },
-  { id: 2, title: 'Full Body Strength', category: 'Strength', duration: '60 Min', level: 'Advanced', calories: 450, image: 'https://picsum.photos/seed/strength/600/400' },
-  { id: 3, title: 'Morning Yoga Flow', category: 'Flexibility', duration: '20 Min', level: 'Beginner', calories: 120, image: 'https://picsum.photos/seed/yoga/600/400' },
-  { id: 4, title: 'Core Crusher', category: 'Strength', duration: '15 Min', level: 'Intermediate', calories: 150, image: 'https://picsum.photos/seed/core/600/400' },
-  { id: 5, title: 'Endurance Run', category: 'Cardio', duration: '45 Min', level: 'Advanced', calories: 500, image: 'https://picsum.photos/seed/run/600/400' },
-  { id: 6, title: 'Mobility Routine', category: 'Flexibility', duration: '25 Min', level: 'Beginner', calories: 100, image: 'https://picsum.photos/seed/mobility/600/400' },
+  { id: 1, title: 'HIIT Cardio Blast', category: 'Cardio', duration: '30 Min', level: 'Intermediate', calories: 350, image: 'https://picsum.photos/seed/hiit/600/400', videoUrl: 'https://www.youtube.com/watch?v=AdqrTg_hpEQ' },
+  { id: 2, title: 'Full Body Strength', category: 'Strength', duration: '60 Min', level: 'Advanced', calories: 450, image: 'https://picsum.photos/seed/strength/600/400', videoUrl: 'https://www.youtube.com/watch?v=3EKcdVsYdk4' },
+  { id: 3, title: 'Morning Yoga Flow', category: 'Flexibility', duration: '20 Min', level: 'Beginner', calories: 120, image: 'https://picsum.photos/seed/yoga/600/400', videoUrl: 'https://www.youtube.com/watch?v=BPRE9o1cEgk' },
+  { id: 4, title: 'Morning Crusher', category: 'Strength', duration: '15 Min', level: 'Intermediate', calories: 150, image: 'https://picsum.photos/seed/core/600/400', videoUrl: 'https://www.youtube.com/watch?v=dJlFmxiL11s' },
+  { id: 5, title: 'Endurance Run', category: 'Cardio', duration: '45 Min', level: 'Advanced', calories: 500, image: 'https://picsum.photos/seed/run/600/400', videoUrl: 'https://www.youtube.com/shorts/-iYYEpFgeoE' },
+  { id: 6, title: 'Mobility Routine', category: 'Flexibility', duration: '25 Min', level: 'Beginner', calories: 100, image: 'https://picsum.photos/seed/mobility/600/400', videoUrl: 'https://www.youtube.com/watch?v=P91Vegj3Qxg' },
 ];
 
 const CATEGORIES = ['All', 'Strength', 'Cardio', 'Flexibility', 'HIIT'];

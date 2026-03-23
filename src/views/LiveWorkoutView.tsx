@@ -74,6 +74,20 @@ export default function LiveWorkoutView({ workout, onClose, onComplete }: LiveWo
 
   const progress = ((currentExercise.duration - timeLeft) / currentExercise.duration) * 100;
   
+  const getEmbedUrl = (url?: string) => {
+    if (!url) return '';
+    let videoId = '';
+    if (url.includes('youtube.com/watch?v=')) {
+      videoId = url.split('v=')[1].split('&')[0];
+    } else if (url.includes('youtu.be/')) {
+      videoId = url.split('youtu.be/')[1].split('?')[0];
+    } else if (url.includes('youtube.com/shorts/')) {
+      videoId = url.split('shorts/')[1].split('?')[0];
+    } else if (url.includes('youtube.com/live/')) {
+      videoId = url.split('live/')[1].split('?')[0];
+    }
+    return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0` : '';
+  };  
   const originalMinutes = parseInt(workout.duration) || 1;
   const caloriesBurned = Math.round((workout.calories / originalMinutes) * (totalTimeElapsed / 60));
 
@@ -144,37 +158,52 @@ export default function LiveWorkoutView({ workout, onClose, onComplete }: LiveWo
       </div>
 
       {/* Main Timer Area */}
-      <div className="flex-1 flex flex-col items-center justify-center p-6 relative">
-        <h2 className={cn(
-          "text-5xl md:text-7xl font-display tracking-wide mb-12 text-center transition-colors duration-300",
-          isRest ? "text-ff-tertiary" : "text-white"
-        )}>
-          {currentExercise.name}
-        </h2>
-
-        <div className="relative w-64 h-64 md:w-80 md:h-80 flex items-center justify-center mb-12">
-          <svg className="absolute inset-0 w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="45" fill="none" stroke="var(--color-ff-surface)" strokeWidth="4" />
-            <circle 
-              cx="50" cy="50" r="45" 
-              fill="none" 
-              stroke={isRest ? "var(--color-ff-tertiary)" : "var(--color-ff-primary)"} 
-              strokeWidth="4" 
-              strokeDasharray="283" 
-              strokeDashoffset={283 - (progress / 100) * 283} 
-              className="transition-all duration-1000 ease-linear" 
-            />
-          </svg>
-          <span className="text-7xl md:text-8xl font-mono font-bold text-white tracking-tighter">
-            {formatTime(timeLeft)}
-          </span>
-        </div>
-
-        {nextExercise && (
-          <div className="flex flex-col items-center text-ff-muted">
-            <span className="text-xs font-bold uppercase tracking-widest mb-1">Up Next</span>
-            <span className="text-xl font-medium">{nextExercise.name}</span>
+      <div className="flex-1 flex flex-col items-center justify-center p-6 relative w-full h-full max-w-5xl mx-auto">
+        {workout.videoUrl ? (
+          <div className="w-full aspect-video rounded-2xl overflow-hidden bg-black shadow-2xl">
+            <iframe 
+              src={getEmbedUrl(workout.videoUrl)} 
+              title="YouTube video player" 
+              frameBorder="0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowFullScreen
+              className="w-full h-full"
+            ></iframe>
           </div>
+        ) : (
+          <>
+            <h2 className={cn(
+              "text-5xl md:text-7xl font-display tracking-wide mb-12 text-center transition-colors duration-300",
+              isRest ? "text-ff-tertiary" : "text-white"
+            )}>
+              {currentExercise.name}
+            </h2>
+
+            <div className="relative w-64 h-64 md:w-80 md:h-80 flex items-center justify-center mb-12">
+              <svg className="absolute inset-0 w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" fill="none" stroke="var(--color-ff-surface)" strokeWidth="4" />
+                <circle 
+                  cx="50" cy="50" r="45" 
+                  fill="none" 
+                  stroke={isRest ? "var(--color-ff-tertiary)" : "var(--color-ff-primary)"} 
+                  strokeWidth="4" 
+                  strokeDasharray="283" 
+                  strokeDashoffset={283 - (progress / 100) * 283} 
+                  className="transition-all duration-1000 ease-linear" 
+                />
+              </svg>
+              <span className="text-7xl md:text-8xl font-mono font-bold text-white tracking-tighter">
+                {formatTime(timeLeft)}
+              </span>
+            </div>
+
+            {nextExercise && (
+              <div className="flex flex-col items-center text-ff-muted">
+                <span className="text-xs font-bold uppercase tracking-widest mb-1">Up Next</span>
+                <span className="text-xl font-medium">{nextExercise.name}</span>
+              </div>
+            )}
+          </>
         )}
       </div>
 
