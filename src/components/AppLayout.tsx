@@ -118,7 +118,7 @@ export default function AppLayout({ onLogout, userName, userId }: { onLogout: ()
   if (!isProfileChecked) {
     console.log('AppLayout: showing profile check loading spinner');
     return (
-      <div className="flex items-center justify-center h-screen w-full bg-ff-bg">
+      <div className="flex items-center justify-center min-h-[100dvh] w-full bg-ff-bg">
         <Loader2 className="w-8 h-8 animate-spin text-ff-primary" />
       </div>
     );
@@ -126,7 +126,7 @@ export default function AppLayout({ onLogout, userName, userId }: { onLogout: ()
 
   console.log('AppLayout: rendering main layout, activeTab:', activeTab);
   return (
-    <div className="flex h-screen w-full bg-ff-bg text-ff-text overflow-hidden font-sans">
+    <div className="flex min-h-[100dvh] w-full bg-ff-bg text-ff-text overflow-hidden font-sans">
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex flex-col w-64 border-r border-ff-surface bg-ff-bg">
         <div className="p-6 flex items-center gap-3">
@@ -187,7 +187,7 @@ export default function AppLayout({ onLogout, userName, userId }: { onLogout: ()
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col h-full relative overflow-hidden">
+      <main className="flex-1 flex flex-col min-h-0 relative overflow-hidden">
         {/* Mobile Header */}
         <header className="md:hidden flex items-center justify-between p-4 border-b border-ff-surface bg-ff-bg z-10">
           <span className="text-3xl font-display tracking-wider text-ff-primary">FWA</span>
@@ -238,14 +238,14 @@ export default function AppLayout({ onLogout, userName, userId }: { onLogout: ()
         </header>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden pb-24 md:pb-0">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden pb-[calc(6rem+env(safe-area-inset-bottom))] md:pb-0">
           <div className="p-4 md:p-8 max-w-7xl mx-auto w-full">
             {renderContent()}
           </div>
         </div>
 
         {/* Mobile Bottom Nav */}
-        <nav className="md:hidden absolute bottom-0 left-0 right-0 bg-ff-surface border-t border-ff-surface pb-safe pt-2 px-2 z-50 overflow-x-auto scrollbar-none">
+        <nav className="md:hidden absolute bottom-0 left-0 right-0 bg-ff-surface border-t border-ff-surface pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-2 px-2 z-50 overflow-x-auto scrollbar-none">
           <div className="flex justify-between items-center min-w-max px-2 gap-2">
             {[...tabs, { id: 'profile', label: 'Profile', icon: User }].map((tab) => {
               const Icon = tab.icon;

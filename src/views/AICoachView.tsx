@@ -90,7 +90,7 @@ export default function AICoachView() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-12rem)] md:h-[calc(100vh-8rem)] bg-ff-surface rounded-3xl border border-ff-surface overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="flex flex-col h-[calc(100dvh-12rem)] md:h-[calc(100dvh-8rem)] bg-ff-surface rounded-3xl border border-ff-surface overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Chat Header */}
       <div className="p-4 border-b border-ff-bg bg-ff-surface flex items-center gap-4">
         <div className="relative">

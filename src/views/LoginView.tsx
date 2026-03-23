@@ -45,7 +45,7 @@ export default function LoginView() {
   };
 
   return (
-    <div className="min-h-screen bg-ff-bg flex flex-col md:flex-row">
+    <div className="min-h-[100dvh] bg-ff-bg flex flex-col md:flex-row">
       {/* Left Side - Branding & AI Quote */}
       <div className="flex-1 bg-gradient-to-br from-ff-surface to-black p-8 md:p-16 flex flex-col justify-between relative overflow-hidden">
         <div className="absolute inset-0 opacity-20 bg-[url('https://picsum.photos/seed/gym/1200/800')] bg-cover bg-center mix-blend-overlay" />

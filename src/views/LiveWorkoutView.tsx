@@ -179,7 +179,7 @@ export default function LiveWorkoutView({ workout, onClose, onComplete }: LiveWo
       </div>
 
       {/* Controls */}
-      <div className="p-8 flex items-center justify-center gap-6 pb-safe">
+      <div className="p-8 flex items-center justify-center gap-6 pb-[calc(2rem+env(safe-area-inset-bottom))]">
         <button 
           onClick={() => setIsFinished(true)}
           className="w-16 h-16 rounded-full bg-ff-surface flex items-center justify-center text-ff-muted hover:text-red-500 hover:bg-ff-surface/80 transition-colors"

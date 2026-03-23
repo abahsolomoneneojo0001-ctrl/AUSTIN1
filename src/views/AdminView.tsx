@@ -4,7 +4,7 @@ import { cn } from '../lib/utils';
 
 export default function AdminView({ onLogout }: { onLogout: () => void }) {
   return (
-    <div className="min-h-screen bg-ff-bg text-ff-text font-sans flex flex-col md:flex-row">
+    <div className="min-h-[100dvh] bg-ff-bg text-ff-text font-sans flex flex-col md:flex-row">
       {/* Sidebar */}
       <aside className="w-full md:w-64 bg-ff-surface border-r border-ff-surface p-6 flex flex-col">
         <div className="flex items-center gap-3 mb-12">

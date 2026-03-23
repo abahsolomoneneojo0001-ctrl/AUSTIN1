@@ -95,7 +95,7 @@ export default function App() {
   if (loading) {
     console.log('App: showing loading spinner');
     return (
-      <div className="min-h-screen bg-ff-bg flex items-center justify-center">
+      <div className="min-h-[100dvh] bg-ff-bg flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-ff-primary animate-spin" />
       </div>
     );
