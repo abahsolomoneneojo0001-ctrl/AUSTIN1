@@ -41,10 +41,11 @@ export default function LiveWorkoutView({ workout, onClose, onComplete }: LiveWo
   }, [isPaused, isFinished]);
 
   useEffect(() => {
+    if (workout.videoUrl) return;
     if (timeLeft <= 0 && !isFinished) {
       handleNext();
     }
-  }, [timeLeft, isFinished]);
+  }, [timeLeft, isFinished, workout.videoUrl]);
 
   const handleNext = () => {
     if (currentExerciseIndex < EXERCISES.length - 1) {
@@ -209,25 +210,36 @@ export default function LiveWorkoutView({ workout, onClose, onComplete }: LiveWo
 
       {/* Controls */}
       <div className="p-8 flex items-center justify-center gap-6 pb-[calc(2rem+env(safe-area-inset-bottom))]">
-        <button 
-          onClick={() => setIsFinished(true)}
-          className="w-16 h-16 rounded-full bg-ff-surface flex items-center justify-center text-ff-muted hover:text-red-500 hover:bg-ff-surface/80 transition-colors"
-          title="Finish Workout Early"
-        >
-          <div className="w-5 h-5 bg-current rounded-sm" />
-        </button>
-        <button 
-          onClick={() => setIsPaused(!isPaused)}
-          className="w-20 h-20 rounded-full bg-ff-surface flex items-center justify-center text-white hover:bg-ff-surface/80 transition-colors"
-        >
-          {isPaused ? <Play className="w-8 h-8 ml-1" /> : <Pause className="w-8 h-8" />}
-        </button>
-        <button 
-          onClick={handleNext}
-          className="w-16 h-16 rounded-full bg-ff-surface flex items-center justify-center text-ff-muted hover:text-white hover:bg-ff-surface/80 transition-colors"
-        >
-          <SkipForward className="w-6 h-6" />
-        </button>
+        {workout.videoUrl ? (
+          <button 
+            onClick={() => setIsFinished(true)}
+            className="px-12 py-4 rounded-full bg-ff-primary text-black font-bold hover:bg-ff-primary/80 transition-colors uppercase tracking-widest text-sm"
+          >
+            Finish Workout
+          </button>
+        ) : (
+          <>
+            <button 
+              onClick={() => setIsFinished(true)}
+              className="w-16 h-16 rounded-full bg-ff-surface flex items-center justify-center text-ff-muted hover:text-red-500 hover:bg-ff-surface/80 transition-colors"
+              title="Finish Workout Early"
+            >
+              <div className="w-5 h-5 bg-current rounded-sm" />
+            </button>
+            <button 
+              onClick={() => setIsPaused(!isPaused)}
+              className="w-20 h-20 rounded-full bg-ff-surface flex items-center justify-center text-white hover:bg-ff-surface/80 transition-colors"
+            >
+              {isPaused ? <Play className="w-8 h-8 ml-1" /> : <Pause className="w-8 h-8" />}
+            </button>
+            <button 
+              onClick={handleNext}
+              className="w-16 h-16 rounded-full bg-ff-surface flex items-center justify-center text-ff-muted hover:text-white hover:bg-ff-surface/80 transition-colors"
+            >
+              <SkipForward className="w-6 h-6" />
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
