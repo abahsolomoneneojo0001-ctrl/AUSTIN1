@@ -137,21 +137,25 @@ export default function LiveWorkoutView({ workout, onClose, onComplete }: LiveWo
   return (
     <div className="fixed inset-0 z-50 bg-ff-bg flex flex-col animate-in slide-in-from-bottom-full duration-300">
       {/* Header */}
-      <div className="flex items-center justify-between p-6">
+      <div className="flex items-center justify-between p-6 absolute top-0 left-0 right-0 z-10 pointer-events-none">
         <div className="flex flex-col">
-          <span className="text-sm text-ff-muted font-bold uppercase tracking-wider">{workout.title}</span>
-          <span className="text-xs text-ff-primary font-bold">
-            {currentExerciseIndex + 1} / {EXERCISES.length}
-          </span>
+          <span className="text-sm text-ff-muted font-bold uppercase tracking-wider bg-black/50 px-3 py-1 rounded-md backdrop-blur-sm pointer-events-auto w-fit">{workout.title}</span>
+          {!workout.videoUrl && (
+            <span className="text-xs text-ff-primary font-bold mt-1">
+              {currentExerciseIndex + 1} / {EXERCISES.length}
+            </span>
+          )}
         </div>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 bg-ff-surface px-4 py-2 rounded-full">
-            <Clock className="w-4 h-4 text-ff-muted" />
-            <span className="text-white font-mono font-bold">{formatTime(totalTimeElapsed)}</span>
-          </div>
+        <div className="flex items-center gap-4 pointer-events-auto">
+          {!workout.videoUrl && (
+            <div className="flex items-center gap-2 bg-ff-surface/80 backdrop-blur-md px-4 py-2 rounded-full">
+              <Clock className="w-4 h-4 text-ff-muted" />
+              <span className="text-white font-mono font-bold">{formatTime(totalTimeElapsed)}</span>
+            </div>
+          )}
           <button 
             onClick={onClose}
-            className="w-10 h-10 rounded-full bg-ff-surface flex items-center justify-center text-ff-muted hover:text-white transition-colors"
+            className="w-10 h-10 rounded-full bg-ff-surface/80 backdrop-blur-md flex items-center justify-center text-ff-muted hover:text-white transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
