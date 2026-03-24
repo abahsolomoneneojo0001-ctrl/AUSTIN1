@@ -45,7 +45,7 @@ export default function LoginView() {
         {/* Navbar */}
         <nav className="flex items-center justify-between mb-20 lg:mb-28">
           <div className="flex items-center gap-2">
-            <img src="/logo.png" alt="AUSTIN FITNESS Logo" className="h-10 md:h-12 object-contain" />
+            <img src="/logo.jpeg" alt="AUSTIN FITNESS Logo" className="h-10 md:h-12 object-contain" />
           </div>
           <div className="hidden md:flex items-center gap-10 text-[13px] font-semibold text-black/80">
             <a href="#" className="hover:text-black transition-colors">About</a>
