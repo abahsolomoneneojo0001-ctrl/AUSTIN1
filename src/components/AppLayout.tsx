@@ -130,7 +130,7 @@ export default function AppLayout({ onLogout, userName, userId }: { onLogout: ()
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex flex-col w-64 border-r border-ff-surface bg-ff-bg">
         <div className="px-4 pt-6 pb-2 flex items-center gap-3 cursor-pointer" onClick={() => setActiveTab('dashboard')}>
-          <img src="/logo.png" alt="Austin Fitness" className="h-[40px] md:h-[50px] object-contain drop-shadow-md" />
+          <img src="/logo.jpeg" alt="Austin Fitness" className="h-[40px] md:h-[50px] object-contain drop-shadow-md" />
         </div>
         
         <nav className="flex-1 px-4 py-2 space-y-1 overflow-y-auto">
@@ -191,7 +191,7 @@ export default function AppLayout({ onLogout, userName, userId }: { onLogout: ()
         {/* Mobile Header */}
         <header className="md:hidden flex items-center justify-between p-4 border-b border-ff-surface bg-ff-bg z-10">
           <button onClick={() => setActiveTab('dashboard')} className="outline-none pt-1">
-            <img src="/logo.png" alt="Austin Fitness" className="h-8 object-contain drop-shadow-md" />
+            <img src="/logo.jpeg" alt="Austin Fitness" className="h-8 object-contain drop-shadow-md" />
           </button>
           <div className="flex items-center gap-3">
             <button 
