@@ -39,7 +39,7 @@ export default function LoginView() {
   };
 
   return (
-    <div className="min-h-[100dvh] bg-[#F2F7FA] text-[#0A1629] font-sans selection:bg-[#00B4D8] selection:text-white">
+    <div className="min-h-[100dvh] bg-gradient-to-br from-[#F4F9FF] via-[#EBF3FB] to-[#DFEDF7] text-[#0A1629] font-sans selection:bg-[#00B4D8] selection:text-white">
       <div className="max-w-[1400px] mx-auto px-4 md:px-8 pt-6">
         
         {/* Navbar */}

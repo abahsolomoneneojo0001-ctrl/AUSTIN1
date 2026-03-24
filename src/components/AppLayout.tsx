@@ -121,19 +121,19 @@ export default function AppLayout({ onLogout, userName, userId }: { onLogout: ()
   if (!isProfileChecked) {
     console.log('AppLayout: showing profile check loading spinner');
     return (
-      <div className="flex items-center justify-center min-h-[100dvh] w-full bg-ff-bg">
-        <Loader2 className="w-8 h-8 animate-spin text-ff-primary" />
+      <div className="flex items-center justify-center min-h-[100dvh] w-full bg-gradient-to-br from-[#F4F9FF] via-[#EBF3FB] to-[#DFEDF7]">
+        <Loader2 className="w-8 h-8 animate-spin text-ff-cyan" />
       </div>
     );
   }
 
   console.log('AppLayout: rendering main layout, activeTab:', activeTab);
   return (
-    <div className="flex min-h-[100dvh] w-full bg-ff-bg text-ff-text overflow-hidden font-sans">
+    <div className="flex min-h-[100dvh] w-full bg-gradient-to-br from-[#F4F9FF] via-[#EBF3FB] to-[#DFEDF7] text-ff-text overflow-hidden font-sans">
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex flex-col w-64 border-r border-ff-surface bg-ff-bg">
+      <aside className="hidden md:flex flex-col w-64 border-r border-ff-border bg-white/40 backdrop-blur-xl">
         <div className="px-4 pt-6 pb-2 flex items-center gap-3 cursor-pointer" onClick={() => setActiveTab('dashboard')}>
-          <img src="/logo.jpeg" alt="Austin Fitness" className="h-[40px] md:h-[50px] object-contain drop-shadow-md" />
+          <img src="/logo.jpeg" alt="Austin Fitness" className="h-[40px] md:h-[50px] object-contain mix-blend-multiply" />
         </div>
         
         <nav className="flex-1 px-4 py-2 space-y-1 overflow-y-auto">
@@ -158,7 +158,7 @@ export default function AppLayout({ onLogout, userName, userId }: { onLogout: ()
           })}
         </nav>
 
-        <div className="p-4 border-t border-ff-surface space-y-2">
+        <div className="p-4 border-t border-ff-border space-y-2">
           <button 
             onClick={() => setActiveTab('premium')}
             className={cn(
@@ -192,9 +192,9 @@ export default function AppLayout({ onLogout, userName, userId }: { onLogout: ()
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col min-h-0 relative overflow-hidden">
         {/* Mobile Header */}
-        <header className="md:hidden flex items-center justify-between p-4 border-b border-[#1A1A28] bg-[#0D0D14] z-10">
+        <header className="md:hidden flex items-center justify-between p-4 border-b border-ff-border bg-white/50 backdrop-blur-xl z-10">
           <button onClick={() => setActiveTab('dashboard')} className="outline-none pt-1">
-            <img src="/logo.jpeg" alt="Austin Fitness" className="h-8 object-contain drop-shadow-md" />
+            <img src="/logo.jpeg" alt="Austin Fitness" className="h-8 object-contain mix-blend-multiply" />
           </button>
           <div className="flex items-center gap-3">
             <button 
@@ -218,8 +218,8 @@ export default function AppLayout({ onLogout, userName, userId }: { onLogout: ()
         </header>
 
         {/* Desktop Header */}
-        <header className="hidden md:flex items-center justify-between px-8 py-4 border-b border-ff-surface bg-ff-bg z-10">
-          <h1 className="text-3xl font-display tracking-wide text-ff-text uppercase">
+        <header className="hidden md:flex items-center justify-between px-8 py-4 border-b border-ff-border bg-transparent z-10">
+          <h1 className="text-3xl font-display tracking-wide text-ff-text uppercase drop-shadow-sm">
             {activeTab}
           </h1>
           <div className="flex items-center gap-4">
@@ -250,7 +250,7 @@ export default function AppLayout({ onLogout, userName, userId }: { onLogout: ()
         </div>
 
         {/* Mobile Bottom Nav */}
-        <nav className="md:hidden absolute bottom-0 left-0 right-0 bg-[#0D0D14] border-t border-[#1A1A28] pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-3 px-4 z-50">
+        <nav className="md:hidden absolute bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-ff-border pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-3 px-4 z-50">
           <div className="flex justify-around items-center w-full">
             {tabs.map((tab) => {
               const Icon = tab.icon;
@@ -260,12 +260,12 @@ export default function AppLayout({ onLogout, userName, userId }: { onLogout: ()
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as Tab)}
                   className={cn(
-                    "flex flex-col items-center justify-center gap-1.5 transition-all text-[#8E8E93]",
-                    isActive ? "text-[#C8FF57]" : "hover:text-white"
+                    "flex flex-col items-center justify-center gap-1.5 transition-all text-ff-muted",
+                    isActive ? "text-ff-cyan drop-shadow-sm" : "hover:text-ff-text"
                   )}
                 >
                   <Icon className={cn("w-[22px] h-[22px]", isActive && "fill-current")} strokeWidth={isActive ? 2.5 : 2} />
-                  <span className="text-[10px] font-medium tracking-wide">
+                  <span className="text-[10px] font-bold tracking-wide">
                     {tab.label}
                   </span>
                 </button>
