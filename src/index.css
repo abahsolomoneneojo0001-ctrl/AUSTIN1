@@ -2,14 +2,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap');
 
 @theme {
-  --color-ff-bg: #111111;
-  --color-ff-surface: #1C1C1E;
-  --color-ff-text: #FFFFFF;
-  --color-ff-muted: #8E8E93;
-  --color-ff-primary: #FFFFFF;
-  --color-ff-secondary: #CCCCCC;
-  --color-ff-tertiary: #666666;
-  --color-ff-quaternary: #333333;
+  --color-ff-bg: transparent;
+  --color-ff-surface: rgba(255, 255, 255, 0.4);
+  --color-ff-text: #0f172a;
+  --color-ff-muted: #475569;
+  --color-ff-primary: #0284c7;
+  --color-ff-secondary: #0ea5e9;
+  --color-ff-tertiary: #7dd3fc;
+  --color-ff-quaternary: #e0f2fe;
 
   --font-display: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
   --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
@@ -18,22 +18,24 @@
 }
 
 :root.light {
-  --color-ff-bg: #F2F2F2;
-  --color-ff-surface: #FFFFFF;
-  --color-ff-text: #000000;
-  --color-ff-muted: #666666;
-  --color-ff-primary: #000000;
-  --color-ff-secondary: #333333;
-  --color-ff-tertiary: #999999;
-  --color-ff-quaternary: #CCCCCC;
+  --color-ff-bg: transparent;
+  --color-ff-surface: rgba(255, 255, 255, 0.6);
+  --color-ff-text: #0f172a;
+  --color-ff-muted: #475569;
+  --color-ff-primary: #0284c7;
+  --color-ff-secondary: #0ea5e9;
+  --color-ff-tertiary: #7dd3fc;
+  --color-ff-quaternary: #e0f2fe;
 }
 
 body {
-  background-color: var(--color-ff-bg);
+  background: linear-gradient(135deg, #f0f9ff 0%, #bae6fd 100%);
+  background-attachment: fixed;
   color: var(--color-ff-text);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  min-height: 100dvh;
 }
 
 /* Utility classes used across the app (Tailwind doesn't generate arbitrary safety-area helpers by default) */

@@ -207,7 +207,7 @@ export default function AppLayout({ onLogout, userName, userId }: { onLogout: ()
               <LogOut className="w-5 h-5" />
             </button>
             <button onClick={() => setActiveTab('profile')} className="w-8 h-8 rounded-full bg-ff-surface flex items-center justify-center overflow-hidden border border-ff-surface">
-              <div className="w-full h-full bg-gradient-to-br from-ff-primary to-ff-quaternary flex items-center justify-center text-black font-bold text-xs">
+              <div className="w-full h-full bg-gradient-to-br from-ff-primary to-ff-quaternary flex items-center justify-center text-white font-bold text-xs">
                 {userName.substring(0, 2).toUpperCase()}
               </div>
             </button>
@@ -231,7 +231,7 @@ export default function AppLayout({ onLogout, userName, userId }: { onLogout: ()
               <Bell className="w-5 h-5" />
             </button>
             <button onClick={() => setActiveTab('profile')} className="flex items-center gap-3 pl-2 pr-4 py-1.5 rounded-full bg-ff-surface hover:bg-ff-surface/80 border border-ff-surface transition-colors">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-ff-primary to-ff-quaternary flex items-center justify-center text-black font-bold text-sm">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-ff-primary to-ff-quaternary flex items-center justify-center text-white font-bold text-sm">
                 {userName.substring(0, 2).toUpperCase()}
               </div>
               <span className="text-sm font-bold text-ff-text">{userName}</span>
