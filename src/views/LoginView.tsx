@@ -39,13 +39,13 @@ export default function LoginView() {
   };
 
   return (
-    <div className="min-h-[100dvh] bg-[#F4F8FB] text-[#0A1629] font-sans selection:bg-[#00B4D8] selection:text-white">
+    <div className="min-h-[100dvh] bg-[#F2F7FA] text-[#0A1629] font-sans selection:bg-[#00B4D8] selection:text-white">
       <div className="max-w-[1400px] mx-auto px-4 md:px-8 pt-6">
         
         {/* Navbar */}
         <nav className="flex items-center justify-between mb-20 lg:mb-28">
           <div className="flex items-center gap-2">
-            <img src="/logo.jpeg" alt="AUSTIN FITNESS Logo" className="h-10 md:h-12 object-contain mix-blend-multiply" />
+            <img src="/logo.jpeg" alt="AUSTIN FITNESS Logo" className="h-10 md:h-12 object-contain" />
           </div>
           <div className="hidden md:flex items-center gap-10 text-[13px] font-semibold text-[#0A1629]/80">
             <a href="#" className="hover:text-[#00B4D8] transition-colors">About</a>
