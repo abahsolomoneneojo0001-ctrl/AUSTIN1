@@ -1,418 +1,173 @@
 import React, { useState, useEffect } from 'react';
-import { Flame, Target, Zap, ChevronRight, Activity, Trophy, CheckCircle2, Calendar, ChevronDown, ChevronUp, Dumbbell, Utensils, Loader2, Sparkles } from 'lucide-react';
-import { cn, calculateStrictStreak } from '../lib/utils';
-import { db, auth, handleFirestoreError, OperationType } from '../lib/firebase';
-import { collection, query, where, getDocs, onSnapshot, addDoc, serverTimestamp, doc, updateDoc, increment } from 'firebase/firestore';
-import { format, isWithinInterval, parseISO, startOfDay, endOfDay } from 'date-fns';
-import { getAIClient } from '../lib/gemini';
-import Markdown from 'react-markdown';
+import { cn } from '../lib/utils';
+import { format } from 'date-fns';
 
-export default function DashboardView({ onNavigate, userName = "Jacob", userId }: { onNavigate: (tab: any) => void, userName?: string, userId?: string }) {
-  const [streak, setStreak] = useState<number | null>(null);
-  const [stats, setStats] = useState<any>({ totalWorkouts: 0, totalMinutes: 0, caloriesBurned: 0 });
-  const [userProfile, setUserProfile] = useState<any>(null);
-  const [isLogging, setIsLogging] = useState(false);
-
-  // AI Plan State
-  const [aiPlan, setAiPlan] = useState<string | null>(null);
-  const [isGeneratingPlan, setIsGeneratingPlan] = useState(false);
-
-  // History State
-  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
-  const [startDate, setStartDate] = useState<string>('');
-  const [endDate, setEndDate] = useState<string>('');
-  const [activities, setActivities] = useState<any[]>([]);
-
-  useEffect(() => {
-    if (!userId) return;
-
-    // Listen to user stats and profile
-    const userUnsub = onSnapshot(doc(db, 'users', userId), (docSnap) => {
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        setUserProfile(data);
-        if (data.stats) {
-          setStats(data.stats);
-        }
-      }
-    }, (error) => handleFirestoreError(error, OperationType.GET, `users/${userId}`));
-
-    // Listen to workouts
-    const qWorkouts = query(collection(db, 'workouts'), where('userId', '==', userId));
-    const workoutsUnsub = onSnapshot(qWorkouts, (snapshot) => {
-      const logs = snapshot.docs
-        .map(doc => {
-          const dateVal = doc.data().date;
-          if (typeof dateVal === 'string') return dateVal;
-          if (dateVal?.toDate && typeof dateVal.toDate === 'function') {
-            return format(dateVal.toDate(), 'yyyy-MM-dd');
-          }
-          return '';
-        })
-        .filter(Boolean);
-
-      setStreak(calculateStrictStreak(logs));
-
-      const normalizeTimestamp = (ts: any) => {
-        if (!ts) return Date.now();
-        if (typeof ts.toMillis === 'function') return ts.toMillis();
-        if (typeof ts.toDate === 'function') return ts.toDate().getTime();
-        if (typeof ts === 'number') return ts;
-        return Date.now();
-      };
-
-      const workoutDocs = snapshot.docs.map(doc => {
-        const data = doc.data();
-        const title = typeof data.title === 'string' ? data.title : 'Workout';
-        const date = typeof data.date === 'string' ? data.date : '';
-        const duration = typeof data.duration === 'string' ? data.duration : '';
-        const calories = typeof data.calories === 'number' ? data.calories : 0;
-
-        return {
-          id: doc.id,
-          type: 'workout',
-          title,
-          date,
-          details: `${duration} • ${calories} kcal`,
-          timestamp: normalizeTimestamp(data.timestamp)
-        };
-      });
-      
-      setActivities(prev => {
-        const nonWorkouts = prev.filter(a => a.type !== 'workout');
-        return [...nonWorkouts, ...workoutDocs].sort((a, b) => b.timestamp - a.timestamp);
-      });
-    }, (error) => {
-      console.warn('Could not fetch workouts:', error);
-    });
-
-    // Listen to meals
-    const qMeals = query(collection(db, 'meals'), where('userId', '==', userId));
-    const mealsUnsub = onSnapshot(qMeals, (snapshot) => {
-      const normalizeTimestamp = (ts: any) => {
-        if (!ts) return Date.now();
-        if (typeof ts.toMillis === 'function') return ts.toMillis();
-        if (typeof ts.toDate === 'function') return ts.toDate().getTime();
-        if (typeof ts === 'number') return ts;
-        return Date.now();
-      };
-
-      const mealDocs = snapshot.docs.map(doc => {
-        const data = doc.data();
-        const name = typeof data.name === 'string' ? data.name : '';
-        const type = typeof data.type === 'string' ? data.type : '';
-        const date = typeof data.date === 'string' ? data.date : '';
-        const calories = typeof data.calories === 'number' ? data.calories : 0;
-        const protein = typeof data.protein === 'number' ? data.protein : 0;
-
-        return {
-          id: doc.id,
-          type: 'meal',
-          title: name || type,
-          date,
-          details: `${calories} kcal • ${protein}g P`,
-          timestamp: normalizeTimestamp(data.timestamp)
-        };
-      });
-
-      setActivities(prev => {
-        const nonMeals = prev.filter(a => a.type !== 'meal');
-        return [...nonMeals, ...mealDocs].sort((a, b) => b.timestamp - a.timestamp);
-      });
-    }, (error) => {
-      // Ignore if meals collection doesn't exist or permission denied for now
-      console.warn("Could not fetch meals:", error);
-    });
-
-    return () => {
-      userUnsub();
-      workoutsUnsub();
-      mealsUnsub();
-    };
-  }, [userId]);
-
-  const handleLogWorkout = async () => {
-    if (!userId) return;
-    setIsLogging(true);
-    try {
-      const todayStr = format(new Date(), 'yyyy-MM-dd');
-      
-      // Add workout log
-      await addDoc(collection(db, 'workouts'), {
-        userId,
-        title: 'Quick Workout',
-        date: todayStr,
-        duration: '45 Min',
-        calories: 350,
-        timestamp: serverTimestamp()
-      });
-
-      // Update user stats
-      await updateDoc(doc(db, 'users', userId), {
-        'stats.totalWorkouts': increment(1),
-        'stats.totalMinutes': increment(45),
-        'stats.caloriesBurned': increment(350)
-      });
-      
-      alert('Workout logged! Streak updated.');
-    } catch (err) {
-      handleFirestoreError(err, OperationType.WRITE, 'workouts');
-    }
-    setIsLogging(false);
-  };
-
-  const generateAIPlan = async () => {
-    setIsGeneratingPlan(true);
-    try {
-      const ai = getAIClient();
-      if (!ai) throw new Error("AI client not initialized.");
-
-      const recentWorkouts = activities.filter(a => a.type === 'workout').slice(0, 5);
-      const workoutContext = recentWorkouts.length > 0 
-        ? `Recent workouts: ${recentWorkouts.map(w => w.title).join(', ')}.`
-        : "No recent workouts logged.";
-
-      let profileContext = '';
-      if (userProfile) {
-        const { personalDetails, fitnessGoals, experienceLevel, dietaryRestrictions } = userProfile;
-        if (personalDetails) {
-          profileContext += `\nAge: ${personalDetails.age || 'N/A'}, Weight: ${personalDetails.weight || 'N/A'}kg, Height: ${personalDetails.height || 'N/A'}cm, Gender: ${personalDetails.gender || 'N/A'}.`;
-        }
-        if (fitnessGoals) profileContext += `\nFitness Goals: ${fitnessGoals}.`;
-        if (experienceLevel) profileContext += `\nExperience Level: ${experienceLevel}.`;
-        if (dietaryRestrictions) profileContext += `\nDietary Restrictions: ${dietaryRestrictions}.`;
-      }
-
-      const prompt = `You are an expert AI fitness coach. Generate a personalized 7-day workout plan for ${userName}. 
-      ${profileContext}
-      ${workoutContext}
-      Consider their current activity level, goals, and any dietary restrictions to provide a balanced routine including strength, cardio, and active recovery.
-      Format the response in clean Markdown.`;
-
-      const response = await ai.models.generateContent({
-        model: 'gemini-3.1-pro-preview',
-        contents: prompt,
-      });
-
-      setAiPlan(response.text || "Could not generate plan.");
-    } catch (error) {
-      console.error("Failed to generate AI plan:", error);
-      alert("Failed to generate AI plan. Please try again.");
-    } finally {
-      setIsGeneratingPlan(false);
-    }
-  };
-
-  const filteredActivities = activities.filter(activity => {
-    if (!startDate && !endDate) return true;
-    const activityDate = parseISO(activity.date);
-    const start = startDate ? startOfDay(parseISO(startDate)) : new Date(0);
-    const end = endDate ? endOfDay(parseISO(endDate)) : new Date(8640000000000000);
-    return isWithinInterval(activityDate, { start, end });
-  });
+export default function DashboardView({ onNavigate, userName = "Alex", userId }: { onNavigate: (tab: any) => void, userName?: string, userId?: string }) {
+  const currentDate = new Date();
+  const dateString = format(currentDate, "EEEE — 'Leg day'");
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      {/* Hero Section */}
-      <div className="relative overflow-hidden rounded-[20px] bg-ff-surface border border-ff-surface p-6 md:p-8">
-        <div className="absolute top-0 right-0 -mt-16 -mr-16 w-64 h-64 bg-ff-primary/10 rounded-full blur-3xl pointer-events-none" />
-        
-        <div className="relative z-10 flex flex-col items-start md:items-center justify-between gap-6 md:flex-row">
-          <div className="w-full">
-            <p className="text-ff-muted font-bold mb-1">Good morning,</p>
-            <h2 className="text-4xl font-display tracking-wide text-ff-text mb-4">READY TO CRUSH IT,<br/><span className="text-ff-primary">{userName.toUpperCase()}?</span></h2>
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
-              <button onClick={() => onNavigate('workouts')} className="px-6 py-3 bg-ff-primary text-black font-bold rounded-full hover:bg-ff-primary/80 transition-colors">
-                START WORKOUT
-              </button>
-              <button 
-                onClick={handleLogWorkout} 
-                disabled={isLogging}
-                className="px-6 py-3 bg-ff-surface text-ff-text font-bold rounded-full hover:bg-ff-surface/80 transition-colors border border-ff-surface flex items-center gap-2 disabled:opacity-50"
-              >
-                <CheckCircle2 className="w-4 h-4" />
-                {isLogging ? 'Logging...' : 'Log Workout (Test Streak)'}
-              </button>
-            </div>
-          </div>
+    <div className="space-y-4 max-w-3xl mx-auto pb-24 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      
+      {/* Header */}
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-white mb-1">Good morning, <span className="text-ff-lime">{userName}</span></h1>
+          <p className="text-ff-muted text-sm">{dateString}</p>
+        </div>
+        <div className="w-12 h-12 rounded-full border border-ff-lime flex items-center justify-center text-ff-lime font-bold text-sm tracking-wider">
+           {userName.substring(0, 2).toUpperCase()}
         </div>
       </div>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-          { label: 'Workouts', value: stats.totalWorkouts || 0, icon: Activity, color: 'text-ff-secondary', bg: 'bg-ff-secondary/10' },
-          { label: 'Minutes', value: stats.totalMinutes || 0, icon: Zap, color: 'text-ff-tertiary', bg: 'bg-ff-tertiary/10' },
-          { label: 'Calories', value: stats.caloriesBurned || 0, icon: Target, color: 'text-ff-quaternary', bg: 'bg-ff-quaternary/10' },
-          { label: 'Streak', value: streak || 0, icon: Trophy, color: 'text-ff-primary', bg: 'bg-ff-primary/10' },
-        ].map((stat, i) => (
-          <div key={i} className="p-5 rounded-[20px] bg-ff-surface flex flex-col gap-3">
-            <div className="flex items-center gap-2">
-              <div className={cn("w-3 h-3 rounded-sm", stat.bg, stat.color)} />
-              <p className="text-2xl font-mono font-bold text-ff-text">{stat.value}</p>
-            </div>
-            <p className="text-sm text-ff-muted font-bold">{stat.label}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* Streak Tracker */}
-      <div className="p-6 rounded-[20px] bg-ff-surface cursor-pointer hover:border-ff-primary/30 border border-ff-surface transition-colors" onClick={() => onNavigate('progress')}>
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <Flame className={cn("w-6 h-6", streak && streak > 0 ? "text-ff-secondary" : "text-ff-muted")} />
-            <h3 className="text-xl font-display tracking-wide text-ff-text">
-              {streak !== null ? `${streak} DAY STREAK` : 'LOADING STREAK...'}
-            </h3>
-          </div>
-          <ChevronRight className="w-5 h-5 text-ff-muted" />
-        </div>
-        <p className="text-sm text-ff-muted">Click to view detailed progress and connect health apps.</p>
-      </div>
-
-      {/* AI Workout Plan Section */}
-      <div className="p-6 rounded-[20px] bg-ff-surface border border-ff-surface">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-          <div className="flex items-center gap-3">
-            <Sparkles className="w-6 h-6 text-ff-tertiary" />
-            <h3 className="text-xl font-display tracking-wide text-ff-text">AI WORKOUT PLAN</h3>
-          </div>
-          <button
-            onClick={generateAIPlan}
-            disabled={isGeneratingPlan}
-            className="px-4 py-2 bg-ff-tertiary/10 text-ff-tertiary font-bold rounded-full hover:bg-ff-tertiary/20 transition-colors flex items-center gap-2 disabled:opacity-50"
-          >
-            {isGeneratingPlan ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
-            {isGeneratingPlan ? 'Generating...' : 'Generate Plan'}
-          </button>
-        </div>
+      {/* Hero Card: Calories */}
+      <div className="relative overflow-hidden rounded-[20px] bg-ff-lime p-6">
+        {/* Subtle decorative circle */}
+        <div className="absolute top-0 right-0 -mt-12 -mr-12 w-48 h-48 bg-black/5 rounded-full blur-xl pointer-events-none" />
         
-        {aiPlan ? (
-          <div className="prose prose-invert max-w-none prose-p:leading-relaxed prose-a:text-ff-tertiary bg-ff-bg p-6 rounded-xl border border-ff-surface">
-            <Markdown>{aiPlan}</Markdown>
+        <div className="relative z-10">
+          <p className="text-black/80 font-medium mb-1 tracking-tight">Today's calories burned</p>
+          <div className="flex items-baseline gap-1 mb-4">
+            <h2 className="text-5xl font-medium tracking-tight text-black">1,842</h2>
+            <span className="text-black/70 font-medium">kcal</span>
           </div>
-        ) : (
-          <div className="text-center p-8 bg-ff-bg rounded-xl border border-ff-surface">
-            <p className="text-ff-muted">Click "Generate Plan" to get a personalized 7-day workout routine based on your goals and recent activity.</p>
-          </div>
-        )}
-      </div>
-
-      {/* Activity History Section */}
-      <div className="rounded-[20px] bg-ff-surface border border-ff-surface overflow-hidden">
-        <button 
-          onClick={() => setIsHistoryOpen(!isHistoryOpen)}
-          className="w-full p-6 flex items-center justify-between hover:bg-ff-surface/80 transition-colors"
-        >
-          <div className="flex items-center gap-3">
-            <Calendar className="w-6 h-6 text-ff-quaternary" />
-            <h3 className="text-xl font-display tracking-wide text-ff-text">ACTIVITY HISTORY</h3>
-          </div>
-          {isHistoryOpen ? <ChevronUp className="w-5 h-5 text-ff-muted" /> : <ChevronDown className="w-5 h-5 text-ff-muted" />}
-        </button>
-        
-        {isHistoryOpen && (
-          <div className="p-6 pt-0 border-t border-ff-surface">
-            <div className="flex flex-col sm:flex-row gap-4 mb-6 mt-4">
-              <div className="flex flex-col gap-1">
-                <label className="text-xs text-ff-muted font-bold uppercase">Start Date</label>
-                <input 
-                  type="date" 
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="bg-ff-bg border border-ff-surface rounded-lg px-3 py-2 text-white focus:outline-none focus:border-ff-quaternary"
-                />
-              </div>
-              <div className="flex flex-col gap-1">
-                <label className="text-xs text-ff-muted font-bold uppercase">End Date</label>
-                <input 
-                  type="date" 
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="bg-ff-bg border border-ff-surface rounded-lg px-3 py-2 text-white focus:outline-none focus:border-ff-quaternary"
-                />
-              </div>
-              <div className="flex items-end pb-1">
-                {(startDate || endDate) && (
-                  <button 
-                    onClick={() => { setStartDate(''); setEndDate(''); }}
-                    className="text-xs text-ff-muted hover:text-white underline"
-                  >
-                    Clear Filters
-                  </button>
-                )}
-              </div>
-            </div>
-
-            <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-              {filteredActivities.length > 0 ? (
-                filteredActivities.map((activity) => (
-                  <div key={activity.id} className="flex items-center justify-between p-4 bg-ff-bg rounded-xl border border-ff-surface">
-                    <div className="flex items-center gap-4">
-                      <div className={cn(
-                        "w-10 h-10 rounded-full flex items-center justify-center shrink-0",
-                        activity.type === 'workout' ? "bg-ff-secondary/10 text-ff-secondary" : "bg-ff-tertiary/10 text-ff-tertiary"
-                      )}>
-                        {activity.type === 'workout' ? <Dumbbell className="w-5 h-5" /> : <Utensils className="w-5 h-5" />}
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-white">{activity.title}</h4>
-                        <p className="text-xs text-ff-muted">{activity.date}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-sm font-mono font-bold text-ff-text">{activity.details}</span>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="text-center p-8 text-ff-muted">
-                  No activities found for this date range.
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-6">
-        {/* Today's Plan */}
-        <div className="space-y-4">
-          <h3 className="text-xl font-display tracking-wide text-ff-text">TODAY'S PLAN</h3>
           
-          <div className="group relative overflow-hidden rounded-[20px] bg-ff-surface border border-ff-surface hover:border-ff-primary/50 transition-all cursor-pointer">
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent z-10" />
-            <img 
-              src="https://picsum.photos/seed/workout1/800/400" 
-              alt="Upper Body Strength" 
-              referrerPolicy="no-referrer"
-              className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
-            />
-            <div className="absolute bottom-0 left-0 right-0 p-5 z-20">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="px-2.5 py-1 rounded-full bg-ff-secondary text-white text-xs font-bold tracking-wide uppercase">Strength</span>
-                <span className="text-ff-text text-sm font-bold">Upper Body Strength · 45 min</span>
-              </div>
-              <div className="flex flex-wrap items-center gap-3 mt-4">
-                <button className="px-4 py-2 bg-ff-primary text-black font-bold rounded-full text-sm">START NOW</button>
-                <button className="px-4 py-2 bg-ff-bg text-ff-text font-bold rounded-full text-sm">Preview</button>
-                <button className="px-4 py-2 bg-ff-bg text-ff-text font-bold rounded-full text-sm">Swap</button>
-              </div>
-            </div>
+          <div className="flex items-center justify-between text-black/70 text-sm mb-3 font-medium">
+            <span>Goal: 2,200 kcal</span>
+            <span>67% complete</span>
           </div>
-        </div>
-
-        {/* AI Coach Says */}
-        <div className="space-y-4">
-          <h3 className="text-xl font-display tracking-wide text-ff-text">AI COACH SAYS</h3>
-          <div className="p-6 rounded-[20px] bg-ff-surface border border-ff-quaternary/30 relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-1 h-full bg-ff-quaternary" />
-            <p className="text-ff-text font-medium leading-relaxed">
-              "Your recovery looks great. Perfect day to push!"
-            </p>
+          
+          {/* Progress bar */}
+          <div className="h-2 w-full bg-black/10 rounded-full overflow-hidden">
+            <div className="h-full bg-black rounded-full" style={{ width: '67%' }} />
           </div>
         </div>
       </div>
+
+      {/* Stats Grid: Row 1 */}
+      <div className="grid grid-cols-3 gap-3">
+        {/* Steps */}
+        <div className="p-4 rounded-[20px] bg-ff-surface border border-transparent shadow-sm">
+          <h3 className="text-2xl font-medium text-white mb-1">8,341</h3>
+          <p className="text-sm text-ff-muted mb-3">Steps</p>
+          <div className="inline-flex items-center px-2 py-0.5 rounded-full bg-ff-lime/10 text-ff-lime text-xs font-medium">
+            +12%
+          </div>
+        </div>
+
+        {/* Active */}
+        <div className="p-4 rounded-[20px] bg-ff-surface border border-transparent shadow-sm">
+          <h3 className="text-2xl font-medium text-white mb-1">42<span className="text-base text-ff-muted font-normal ml-0.5">min</span></h3>
+          <p className="text-sm text-ff-muted mb-3">Active</p>
+          <div className="inline-flex items-center px-2 py-0.5 rounded-full bg-ff-amber/10 text-ff-amber text-xs font-medium">
+            On track
+          </div>
+        </div>
+
+        {/* Heart rate */}
+        <div className="p-4 rounded-[20px] bg-ff-surface border border-transparent shadow-sm">
+          <h3 className="text-2xl font-medium text-white mb-1">78<span className="text-base text-ff-muted font-normal ml-0.5">bpm</span></h3>
+          <p className="text-sm text-ff-muted mb-3">Heart rate</p>
+          <div className="inline-flex items-center px-2 py-0.5 rounded-full border border-ff-coral/20 text-ff-coral/80 text-xs font-medium">
+            Resting
+          </div>
+        </div>
+      </div>
+
+      {/* Stats Grid: Row 2 */}
+      <div className="grid grid-cols-2 gap-3">
+        {/* Distance */}
+        <div className="p-4 rounded-[20px] bg-ff-surface border border-[#1A1E29] shadow-sm">
+          <div className="w-2 h-2 rounded-full bg-ff-lime mb-2 shadow-[0_0_8px_rgba(200,255,87,0.5)]" />
+          <h3 className="text-xl font-medium text-white mb-1">5.2 <span className="text-sm text-ff-lime font-normal">km</span></h3>
+          <p className="text-sm text-ff-muted">Distance</p>
+        </div>
+
+        {/* Water */}
+        <div className="p-4 rounded-[20px] bg-[#121922] border border-[#1A2533] shadow-sm">
+          <div className="w-2 h-2 rounded-full bg-ff-cyan mb-2 shadow-[0_0_8px_rgba(87,200,255,0.5)]" />
+          <h3 className="text-xl font-medium text-ff-cyan mb-1">2.1 <span className="text-sm font-normal">L</span></h3>
+          <p className="text-sm text-ff-muted">Water intake</p>
+        </div>
+      </div>
+
+      {/* Stats Grid: Row 3 */}
+      <div className="grid grid-cols-2 gap-3">
+        {/* Sleep */}
+        <div className="p-4 rounded-[20px] bg-[#171221] border border-[#231A33] shadow-sm">
+          <div className="w-2 h-2 rounded-full bg-ff-violet mb-2 shadow-[0_0_8px_rgba(155,87,255,0.5)]" />
+          <h3 className="text-xl font-medium text-ff-violet mb-1">7h 20m</h3>
+          <p className="text-sm text-ff-muted">Sleep</p>
+        </div>
+
+        {/* Peak HR */}
+        <div className="p-4 rounded-[20px] bg-[#1D1313] border border-[#2D1A1A] shadow-sm">
+          <div className="w-2 h-2 rounded-full bg-ff-coral mb-2 shadow-[0_0_8px_rgba(255,122,110,0.5)]" />
+          <h3 className="text-xl font-medium text-ff-coral mb-1">148 <span className="text-sm font-normal">bpm</span></h3>
+          <p className="text-sm text-ff-muted">Peak HR</p>
+        </div>
+      </div>
+
+      {/* Weekly Steps Chart */}
+      <div className="p-5 rounded-[20px] bg-ff-surface border border-ff-border mb-4">
+        <p className="text-sm text-ff-muted mb-6">Weekly steps</p>
+        <div className="flex items-end justify-between h-20 mb-3 gap-2">
+          {/* M */}
+          <div className="w-full flex flex-col items-center justify-end h-full">
+            <div className="w-full bg-ff-border rounded-md" style={{ height: '20%' }} />
+          </div>
+          {/* T */}
+          <div className="w-full flex flex-col items-center justify-end h-full">
+            <div className="w-full bg-ff-border rounded-md" style={{ height: '40%' }} />
+          </div>
+          {/* W */}
+          <div className="w-full flex flex-col items-center justify-end h-full">
+            <div className="w-full bg-ff-border rounded-md" style={{ height: '30%' }} />
+          </div>
+          {/* T */}
+          <div className="w-full flex flex-col items-center justify-end h-full">
+            <div className="w-full bg-ff-border rounded-md" style={{ height: '50%' }} />
+          </div>
+          {/* F */}
+          <div className="w-full flex flex-col items-center justify-end h-full">
+            <div className="w-full bg-ff-border rounded-md" style={{ height: '35%' }} />
+          </div>
+          {/* S (Today, active) */}
+          <div className="w-full flex flex-col items-center justify-end h-full">
+            <div className="w-full bg-ff-lime rounded-md shadow-[0_0_15px_rgba(200,255,87,0.2)]" style={{ height: '80%' }} />
+          </div>
+          {/* S */}
+          <div className="w-full flex flex-col items-center justify-end h-full">
+            <div className="w-full bg-ff-border rounded-md" style={{ height: '15%' }} />
+          </div>
+        </div>
+        <div className="flex items-center justify-between text-[10px] text-ff-muted font-medium px-2">
+          <span>M</span>
+          <span>T</span>
+          <span>W</span>
+          <span>T</span>
+          <span>F</span>
+          <span className="text-ff-lime font-bold">S</span>
+          <span>S</span>
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div className="grid grid-cols-2 gap-3">
+        <button 
+          className="py-4 rounded-[16px] bg-[#0A0A0F] border border-[#14141E] text-[#2A2A3E] font-medium text-sm transition-colors cursor-not-allowed"
+          disabled
+        >
+          Start workout
+        </button>
+        <button 
+          className="py-4 rounded-[16px] bg-[#0A0A0F] border border-[#14141E] text-[#2A2A3E] font-medium text-sm transition-colors cursor-not-allowed"
+          disabled
+        >
+          Log meal
+        </button>
+      </div>
+
     </div>
   );
 }
