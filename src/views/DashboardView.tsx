@@ -222,7 +222,7 @@ export default function DashboardView({ onNavigate, userName = "Jacob", userId }
             <p className="text-ff-muted font-bold mb-1">Good morning,</p>
             <h2 className="text-4xl font-display tracking-wide text-ff-text mb-4">READY TO CRUSH IT,<br/><span className="text-ff-primary">{userName.toUpperCase()}?</span></h2>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
-              <button onClick={() => onNavigate('workouts')} className="px-6 py-3 bg-ff-primary text-black font-bold rounded-full hover:bg-ff-primary/80 transition-colors">
+              <button onClick={() => onNavigate('workouts')} className="px-6 py-3 bg-ff-primary text-white font-bold rounded-full hover:bg-ff-primary/80 transition-colors">
                 START WORKOUT
               </button>
               <button 
@@ -320,7 +320,7 @@ export default function DashboardView({ onNavigate, userName = "Jacob", userId }
                   type="date" 
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="bg-ff-bg border border-ff-surface rounded-lg px-3 py-2 text-white focus:outline-none focus:border-ff-quaternary"
+                  className="bg-transparent border border-ff-surface rounded-lg px-3 py-2 text-ff-text focus:outline-none focus:border-ff-quaternary"
                 />
               </div>
               <div className="flex flex-col gap-1">
@@ -329,14 +329,14 @@ export default function DashboardView({ onNavigate, userName = "Jacob", userId }
                   type="date" 
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="bg-ff-bg border border-ff-surface rounded-lg px-3 py-2 text-white focus:outline-none focus:border-ff-quaternary"
+                  className="bg-transparent border border-ff-surface rounded-lg px-3 py-2 text-ff-text focus:outline-none focus:border-ff-quaternary"
                 />
               </div>
               <div className="flex items-end pb-1">
                 {(startDate || endDate) && (
                   <button 
                     onClick={() => { setStartDate(''); setEndDate(''); }}
-                    className="text-xs text-ff-muted hover:text-white underline"
+                    className="text-xs text-ff-muted hover:text-ff-text underline"
                   >
                     Clear Filters
                   </button>
@@ -356,7 +356,7 @@ export default function DashboardView({ onNavigate, userName = "Jacob", userId }
                         {activity.type === 'workout' ? <Dumbbell className="w-5 h-5" /> : <Utensils className="w-5 h-5" />}
                       </div>
                       <div>
-                        <h4 className="font-bold text-white">{activity.title}</h4>
+                        <h4 className="font-bold text-ff-text">{activity.title}</h4>
                         <p className="text-xs text-ff-muted">{activity.date}</p>
                       </div>
                     </div>
@@ -394,9 +394,9 @@ export default function DashboardView({ onNavigate, userName = "Jacob", userId }
                 <span className="text-ff-text text-sm font-bold">Upper Body Strength · 45 min</span>
               </div>
               <div className="flex flex-wrap items-center gap-3 mt-4">
-                <button className="px-4 py-2 bg-ff-primary text-black font-bold rounded-full text-sm">START NOW</button>
-                <button className="px-4 py-2 bg-ff-bg text-ff-text font-bold rounded-full text-sm">Preview</button>
-                <button className="px-4 py-2 bg-ff-bg text-ff-text font-bold rounded-full text-sm">Swap</button>
+                <button className="px-4 py-2 bg-ff-primary text-white font-bold rounded-full text-sm">START NOW</button>
+                <button className="px-4 py-2 bg-ff-surface text-ff-text font-bold rounded-full text-sm hover:bg-ff-surface/80 transition-colors">Preview</button>
+                <button className="px-4 py-2 bg-ff-surface text-ff-text font-bold rounded-full text-sm hover:bg-ff-surface/80 transition-colors">Swap</button>
               </div>
             </div>
           </div>

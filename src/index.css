@@ -3,13 +3,13 @@
 
 @theme {
   --color-ff-bg: transparent;
-  --color-ff-surface: rgba(255, 255, 255, 0.4);
-  --color-ff-text: #0f172a;
-  --color-ff-muted: #475569;
-  --color-ff-primary: #0284c7;
-  --color-ff-secondary: #0ea5e9;
-  --color-ff-tertiary: #7dd3fc;
-  --color-ff-quaternary: #e0f2fe;
+  --color-ff-surface: rgba(255, 255, 255, 0.5);
+  --color-ff-text: #01426A; /* Deep blue from logo */
+  --color-ff-muted: #5A7C96; /* Muted blue */
+  --color-ff-primary: #0284c7; /* Sky 600 */
+  --color-ff-secondary: #0ea5e9; /* Sky 500 */
+  --color-ff-tertiary: #7dd3fc; /* Sky 300 */
+  --color-ff-quaternary: #e0f2fe; /* Sky 100 */
 
   --font-display: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
   --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
@@ -20,8 +20,8 @@
 :root.light {
   --color-ff-bg: transparent;
   --color-ff-surface: rgba(255, 255, 255, 0.6);
-  --color-ff-text: #0f172a;
-  --color-ff-muted: #475569;
+  --color-ff-text: #01426A;
+  --color-ff-muted: #5A7C96;
   --color-ff-primary: #0284c7;
   --color-ff-secondary: #0ea5e9;
   --color-ff-tertiary: #7dd3fc;
