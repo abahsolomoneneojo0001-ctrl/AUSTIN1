@@ -129,8 +129,8 @@ export default function AppLayout({ onLogout, userName, userId }: { onLogout: ()
     <div className="flex min-h-[100dvh] w-full bg-ff-bg text-ff-text overflow-hidden font-sans">
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex flex-col w-64 border-r border-ff-surface bg-ff-bg">
-        <div className="p-6 flex items-center gap-3">
-          <span className="text-3xl font-display tracking-wider text-ff-primary">FITWITHAUSTIN</span>
+        <div className="p-6 flex items-center gap-3 cursor-pointer" onClick={() => setActiveTab('dashboard')}>
+          <img src="/logo.png" alt="Austin Fitness" className="h-[40px] md:h-[50px] object-contain drop-shadow-md" />
         </div>
         
         <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
@@ -190,7 +190,9 @@ export default function AppLayout({ onLogout, userName, userId }: { onLogout: ()
       <main className="flex-1 flex flex-col min-h-0 relative overflow-hidden">
         {/* Mobile Header */}
         <header className="md:hidden flex items-center justify-between p-4 border-b border-ff-surface bg-ff-bg z-10">
-          <span className="text-3xl font-display tracking-wider text-ff-primary">FWA</span>
+          <button onClick={() => setActiveTab('dashboard')} className="outline-none pt-1">
+            <img src="/logo.png" alt="Austin Fitness" className="h-8 object-contain drop-shadow-md" />
+          </button>
           <div className="flex items-center gap-3">
             <button 
               onClick={toggleTheme}

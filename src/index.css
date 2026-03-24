@@ -2,14 +2,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap');
 
 @theme {
-  --color-ff-bg: #000000;
-  --color-ff-surface: #1C1C1E;
+  --color-ff-bg: #061224;
+  --color-ff-surface: #0A1C36;
   --color-ff-text: #FFFFFF;
-  --color-ff-muted: #8E8E93;
-  --color-ff-primary: #A4FF2A;
-  --color-ff-secondary: #FA114F;
-  --color-ff-tertiary: #00E5FF;
-  --color-ff-quaternary: #FF9F0A;
+  --color-ff-muted: #8B9BB4;
+  --color-ff-primary: #00D2D3;
+  --color-ff-secondary: #6ED35B;
+  --color-ff-tertiary: #19467A;
+  --color-ff-quaternary: #22A6B3;
 
   --font-display: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
   --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
@@ -18,14 +18,14 @@
 }
 
 :root.light {
-  --color-ff-bg: #F2F2F7;
+  --color-ff-bg: #F4F7FB;
   --color-ff-surface: #FFFFFF;
-  --color-ff-text: #000000;
-  --color-ff-muted: #8E8E93;
-  --color-ff-primary: #89D91D;
-  --color-ff-secondary: #D70015;
-  --color-ff-tertiary: #007AFF;
-  --color-ff-quaternary: #FF9500;
+  --color-ff-text: #051A31;
+  --color-ff-muted: #6F85A2;
+  --color-ff-primary: #00AEB5;
+  --color-ff-secondary: #57B447;
+  --color-ff-tertiary: #0A2645;
+  --color-ff-quaternary: #00878E;
 }
 
 body {
