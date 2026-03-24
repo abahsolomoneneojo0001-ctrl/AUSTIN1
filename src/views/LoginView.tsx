@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Play, ArrowRight, Plus, Loader2 } from 'lucide-react';
 import { signInWithGoogle } from '../lib/firebase';
 
@@ -10,6 +10,22 @@ const SparkleIcon = ({ className = "w-8 h-8" }: { className?: string }) => (
 
 export default function LoginView() {
   const [loading, setLoading] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const heroImages = [
+    "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=2940&auto=format&fit=crop", // Weight lifting couple
+    "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=2940&auto=format&fit=crop", // Focused DB lifting 
+    "https://images.unsplash.com/photo-1554244933-d876deb6b2ea?q=80&w=2940&auto=format&fit=crop", // Woman lifting
+    "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2940&auto=format&fit=crop", // Group fitness/rowing
+    "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?q=80&w=2940&auto=format&fit=crop", // Outdoor running
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroImages.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [heroImages.length]);
 
   const handleGoogleLogin = async () => {
     setLoading(true);
@@ -28,7 +44,9 @@ export default function LoginView() {
         
         {/* Navbar */}
         <nav className="flex items-center justify-between mb-20 lg:mb-28">
-          <div className="text-2xl font-impact tracking-wider">ZONIXX</div>
+          <div className="flex items-center gap-2">
+            <img src="/logo.png" alt="AUSTIN FITNESS Logo" className="h-10 md:h-12 object-contain" />
+          </div>
           <div className="hidden md:flex items-center gap-10 text-[13px] font-semibold text-black/80">
             <a href="#" className="hover:text-black transition-colors">About</a>
             <a href="#" className="hover:text-black transition-colors">Trainings</a>
@@ -55,11 +73,16 @@ export default function LoginView() {
         {/* Hero Image Block */}
         <div className="mb-24 md:mb-32">
           <div className="relative w-full aspect-[4/3] sm:aspect-[2/1] lg:aspect-[21/9] rounded-[2rem] lg:rounded-[3rem] overflow-hidden bg-zinc-300">
-            <img 
-              src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=2940&auto=format&fit=crop" 
-              alt="Fitness workout" 
-              className="w-full h-full object-cover" 
-            />
+            {heroImages.map((src, idx) => (
+              <img 
+                key={src}
+                src={src} 
+                alt={`Fitness slide ${idx + 1}`} 
+                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
+                  idx === currentSlide ? "opacity-100" : "opacity-0"
+                }`} 
+              />
+            ))}
             {/* Slight dark gradient for readability */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent"></div>
             
