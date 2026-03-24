@@ -14,10 +14,7 @@ import {
   Sparkles,
   Loader2,
   Sun,
-  Moon,
-  LayoutGrid,
-  Clock,
-  Star
+  Moon
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { db, handleFirestoreError, OperationType } from '../lib/firebase';
@@ -31,7 +28,7 @@ import CoachAustinView from '../views/CoachAustinView';
 import AIHubView from '../views/AIHubView';
 import ProfileSetupView from '../views/ProfileSetupView';
 
-type Tab = 'dashboard' | 'history' | 'goals' | 'profile' | 'workouts' | 'nutrition' | 'progress' | 'coaches' | 'coach' | 'ai-hub' | 'premium';
+type Tab = 'dashboard' | 'workouts' | 'nutrition' | 'progress' | 'coaches' | 'coach' | 'ai-hub' | 'premium' | 'profile';
 
 export default function AppLayout({ onLogout, userName, userId }: { onLogout: () => void, userName: string, userId?: string }) {
   const [activeTab, setActiveTab] = useState<Tab>('dashboard');
@@ -97,23 +94,23 @@ export default function AppLayout({ onLogout, userName, userId }: { onLogout: ()
   }, [userId]);
 
   const tabs = [
-    { id: 'dashboard', label: 'Home', icon: LayoutGrid },
-    { id: 'history', label: 'History', icon: Clock },
-    { id: 'goals', label: 'Goals', icon: Star },
-    { id: 'profile', label: 'Profile', icon: User },
+    { id: 'dashboard', label: 'Home', icon: Home },
+    { id: 'workouts', label: 'Workouts', icon: Dumbbell },
+    { id: 'nutrition', label: 'Nutrition', icon: Apple },
+    { id: 'progress', label: 'Progress', icon: LineChart },
+    { id: 'coaches', label: '1-on-1 Coaching', icon: Users },
+    { id: 'ai-hub', label: 'AI Innovation Hub', icon: Sparkles },
   ] as const;
 
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard': return <DashboardView onNavigate={setActiveTab} userName={userName} userId={userId} />;
-      case 'history': return <DashboardView onNavigate={setActiveTab} userName={userName} userId={userId} />; // Placeholder
-      case 'goals': return <DashboardView onNavigate={setActiveTab} userName={userName} userId={userId} />; // Placeholder
-      case 'profile': return <ProfileSetupView onComplete={() => setActiveTab('dashboard')} />;
       case 'workouts': return <WorkoutsView />;
       case 'nutrition': return <NutritionView />;
       case 'progress': return <ProgressView />;
       case 'coaches': return <CoachAustinView />;
       case 'ai-hub': return <AIHubView />;
+      case 'profile': return <ProfileSetupView onComplete={() => setActiveTab('dashboard')} />;
       default: return <DashboardView onNavigate={setActiveTab} userName={userName} userId={userId} />;
     }
   };
@@ -121,19 +118,19 @@ export default function AppLayout({ onLogout, userName, userId }: { onLogout: ()
   if (!isProfileChecked) {
     console.log('AppLayout: showing profile check loading spinner');
     return (
-      <div className="flex items-center justify-center min-h-[100dvh] w-full bg-gradient-to-br from-[#F4F9FF] via-[#EBF3FB] to-[#DFEDF7]">
-        <Loader2 className="w-8 h-8 animate-spin text-ff-cyan" />
+      <div className="flex items-center justify-center min-h-[100dvh] w-full bg-ff-bg">
+        <Loader2 className="w-8 h-8 animate-spin text-ff-primary" />
       </div>
     );
   }
 
   console.log('AppLayout: rendering main layout, activeTab:', activeTab);
   return (
-    <div className="flex min-h-[100dvh] w-full bg-gradient-to-br from-[#F4F9FF] via-[#EBF3FB] to-[#DFEDF7] text-ff-text overflow-hidden font-sans">
+    <div className="flex min-h-[100dvh] w-full bg-ff-bg text-ff-text overflow-hidden font-sans">
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex flex-col w-64 border-r border-ff-border bg-white/40 backdrop-blur-xl">
+      <aside className="hidden md:flex flex-col w-64 border-r border-ff-surface bg-ff-bg">
         <div className="px-4 pt-6 pb-2 flex items-center gap-3 cursor-pointer" onClick={() => setActiveTab('dashboard')}>
-          <img src="/logo.jpeg" alt="Austin Fitness" className="h-[40px] md:h-[50px] object-contain mix-blend-multiply" />
+          <img src="/logo.png" alt="Austin Fitness" className="h-[40px] md:h-[50px] object-contain drop-shadow-md" />
         </div>
         
         <nav className="flex-1 px-4 py-2 space-y-1 overflow-y-auto">
@@ -158,7 +155,7 @@ export default function AppLayout({ onLogout, userName, userId }: { onLogout: ()
           })}
         </nav>
 
-        <div className="p-4 border-t border-ff-border space-y-2">
+        <div className="p-4 border-t border-ff-surface space-y-2">
           <button 
             onClick={() => setActiveTab('premium')}
             className={cn(
@@ -192,9 +189,9 @@ export default function AppLayout({ onLogout, userName, userId }: { onLogout: ()
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col min-h-0 relative overflow-hidden">
         {/* Mobile Header */}
-        <header className="md:hidden flex items-center justify-between p-4 border-b border-ff-border bg-white/50 backdrop-blur-xl z-10">
+        <header className="md:hidden flex items-center justify-between p-4 border-b border-ff-surface bg-ff-bg z-10">
           <button onClick={() => setActiveTab('dashboard')} className="outline-none pt-1">
-            <img src="/logo.jpeg" alt="Austin Fitness" className="h-8 object-contain mix-blend-multiply" />
+            <img src="/logo.png" alt="Austin Fitness" className="h-8 object-contain drop-shadow-md" />
           </button>
           <div className="flex items-center gap-3">
             <button 
@@ -218,8 +215,8 @@ export default function AppLayout({ onLogout, userName, userId }: { onLogout: ()
         </header>
 
         {/* Desktop Header */}
-        <header className="hidden md:flex items-center justify-between px-8 py-4 border-b border-ff-border bg-transparent z-10">
-          <h1 className="text-3xl font-display tracking-wide text-ff-text uppercase drop-shadow-sm">
+        <header className="hidden md:flex items-center justify-between px-8 py-4 border-b border-ff-surface bg-ff-bg z-10">
+          <h1 className="text-3xl font-display tracking-wide text-ff-text uppercase">
             {activeTab}
           </h1>
           <div className="flex items-center gap-4">
@@ -250,9 +247,9 @@ export default function AppLayout({ onLogout, userName, userId }: { onLogout: ()
         </div>
 
         {/* Mobile Bottom Nav */}
-        <nav className="md:hidden absolute bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-ff-border pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-3 px-4 z-50">
-          <div className="flex justify-around items-center w-full">
-            {tabs.map((tab) => {
+        <nav className="md:hidden absolute bottom-0 left-0 right-0 bg-ff-surface border-t border-ff-surface pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-2 px-2 z-50 overflow-x-auto scrollbar-none">
+          <div className="flex justify-between items-center min-w-max px-2 gap-2">
+            {[...tabs, { id: 'profile', label: 'Profile', icon: User }].map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
               return (
@@ -260,12 +257,12 @@ export default function AppLayout({ onLogout, userName, userId }: { onLogout: ()
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as Tab)}
                   className={cn(
-                    "flex flex-col items-center justify-center gap-1.5 transition-all text-ff-muted",
-                    isActive ? "text-ff-cyan drop-shadow-sm" : "hover:text-ff-text"
+                    "flex flex-col items-center justify-center w-16 h-14 gap-1 rounded-[16px] transition-all",
+                    isActive ? "text-ff-primary" : "text-ff-muted hover:text-ff-text"
                   )}
                 >
-                  <Icon className={cn("w-[22px] h-[22px]", isActive && "fill-current")} strokeWidth={isActive ? 2.5 : 2} />
-                  <span className="text-[10px] font-bold tracking-wide">
+                  <Icon className="w-5 h-5" />
+                  <span className="text-[10px] font-bold">
                     {tab.label}
                   </span>
                 </button>

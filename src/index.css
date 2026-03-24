@@ -2,16 +2,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap');
 
 @theme {
-  --color-ff-bg: #F4F9FF;
-  --color-ff-surface: #FFFFFF;
-  --color-ff-border: #E2E8F0;
-  --color-ff-text: #0A1629;
-  --color-ff-muted: #64748B;
-  --color-ff-lime: #88D44A;
-  --color-ff-cyan: #00B4D8;
-  --color-ff-violet: #8B5CF6;
-  --color-ff-coral: #F43F5E;
-  --color-ff-amber: #F59E0B;
+  --color-ff-bg: #111111;
+  --color-ff-surface: #1C1C1E;
+  --color-ff-text: #FFFFFF;
+  --color-ff-muted: #8E8E93;
+  --color-ff-primary: #FFFFFF;
+  --color-ff-secondary: #CCCCCC;
+  --color-ff-tertiary: #666666;
+  --color-ff-quaternary: #333333;
 
   --font-display: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
   --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
@@ -20,16 +18,14 @@
 }
 
 :root.light {
-  --color-ff-bg: #F4F9FF;
+  --color-ff-bg: #F2F2F2;
   --color-ff-surface: #FFFFFF;
-  --color-ff-border: #E2E8F0;
-  --color-ff-text: #0A1629;
-  --color-ff-muted: #64748B;
-  --color-ff-lime: #88D44A;
-  --color-ff-cyan: #00B4D8;
-  --color-ff-violet: #8B5CF6;
-  --color-ff-coral: #F43F5E;
-  --color-ff-amber: #F59E0B;
+  --color-ff-text: #000000;
+  --color-ff-muted: #666666;
+  --color-ff-primary: #000000;
+  --color-ff-secondary: #333333;
+  --color-ff-tertiary: #999999;
+  --color-ff-quaternary: #CCCCCC;
 }
 
 body {
