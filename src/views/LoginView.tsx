@@ -43,22 +43,25 @@ export default function LoginView() {
       <div className="max-w-[1400px] mx-auto px-4 md:px-8 pt-6">
         
         {/* Navbar */}
-        <nav className="flex items-center justify-between mb-20 lg:mb-28">
+        <nav aria-label="Main Navigation" className="flex items-center justify-between mb-20 lg:mb-28">
           <div className="flex items-center gap-2">
-            <img src="/logo.jpeg" alt="AUSTIN FITNESS Logo" className="h-10 md:h-12 object-contain" />
+            <a href="/" className="rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ff-primary focus-visible:ring-offset-2 focus-visible:ring-offset-transparent">
+              <img src="/logo.jpeg" alt="AUSTIN FITNESS - Return to Homepage" className="h-10 md:h-12 object-contain" />
+            </a>
           </div>
-          <div className="hidden md:flex items-center gap-10 text-[13px] font-semibold text-ff-text/80">
-            <a href="#" className="hover:text-ff-primary transition-colors">About</a>
-            <a href="#" className="hover:text-ff-primary transition-colors">Trainings</a>
-            <a href="#" className="hover:text-ff-primary transition-colors">Testimonials</a>
-            <a href="#" className="hover:text-ff-primary transition-colors">Contacts</a>
-          </div>
+          <ul className="hidden md:flex items-center gap-10 text-[13px] font-semibold text-ff-text/80">
+            <li><a href="#about" className="hover:text-ff-primary rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ff-primary focus-visible:ring-offset-4 focus-visible:ring-offset-transparent transition-colors">About</a></li>
+            <li><a href="#trainings" className="hover:text-ff-primary rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ff-primary focus-visible:ring-offset-4 focus-visible:ring-offset-transparent transition-colors">Trainings</a></li>
+            <li><a href="#testimonials" className="hover:text-ff-primary rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ff-primary focus-visible:ring-offset-4 focus-visible:ring-offset-transparent transition-colors">Testimonials</a></li>
+            <li><a href="#contacts" className="hover:text-ff-primary rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ff-primary focus-visible:ring-offset-4 focus-visible:ring-offset-transparent transition-colors">Contacts</a></li>
+          </ul>
           <button 
             onClick={handleGoogleLogin} 
             disabled={loading}
-            className="border border-ff-primary text-ff-primary rounded-full px-6 py-2.5 text-[11px] font-bold uppercase tracking-widest hover:bg-ff-primary hover:text-white transition-colors flex items-center gap-2"
+            aria-busy={loading}
+            className="border border-ff-primary text-ff-primary rounded-full px-6 py-2.5 text-[11px] font-bold uppercase tracking-widest hover:bg-ff-primary hover:text-white transition-colors flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ff-primary focus-visible:ring-offset-4 focus-visible:ring-offset-transparent"
           >
-            {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "JOIN TODAY"}
+            {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" aria-hidden="true" /> : "JOIN TODAY"}
           </button>
         </nav>
 
@@ -106,8 +109,8 @@ export default function LoginView() {
 
             <div className="absolute bottom-6 right-6 lg:bottom-10 lg:right-10 flex items-center gap-3">
               <span className="text-white font-medium text-sm">3 min</span>
-              <button className="bg-white rounded-full w-10 h-10 lg:w-12 lg:h-12 flex items-center justify-center hover:scale-105 transition-transform">
-                <Play className="w-4 h-4 lg:w-5 lg:h-5 text-ff-primary fill-ff-primary ml-0.5" />
+              <button aria-label="Play promotional video" className="bg-white rounded-full w-10 h-10 lg:w-12 lg:h-12 flex items-center justify-center hover:scale-105 transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ff-primary focus-visible:ring-offset-2">
+                <Play aria-hidden="true" className="w-4 h-4 lg:w-5 lg:h-5 text-ff-primary fill-ff-primary ml-0.5" />
               </button>
             </div>
           </div>
@@ -133,9 +136,10 @@ export default function LoginView() {
           <button 
             onClick={handleGoogleLogin}
             disabled={loading}
-            className="border border-ff-primary text-ff-primary bg-transparent rounded-full px-8 py-3.5 text-[11px] font-bold uppercase tracking-widest hover:bg-ff-primary hover:text-white transition-colors"
+            aria-busy={loading}
+            className="border border-ff-primary text-ff-primary bg-transparent rounded-full px-8 py-3.5 text-[11px] font-bold uppercase tracking-widest hover:bg-ff-primary hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ff-primary focus-visible:ring-offset-4 focus-visible:ring-offset-transparent"
           >
-            {loading ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "JOIN TODAY"}
+            {loading ? <Loader2 className="w-4 h-4 animate-spin mx-auto" aria-hidden="true" /> : "JOIN TODAY"}
           </button>
         </div>
 
@@ -143,8 +147,8 @@ export default function LoginView() {
         <section className="mb-24">
           <div className="flex items-center justify-between mb-8">
             <h4 className="text-xl font-impact uppercase tracking-wider">TRAININGS</h4>
-            <button className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest hover:opacity-70 group text-ff-primary">
-              SEE ALL <span className="w-5 h-5 rounded-full bg-ff-primary text-white flex items-center justify-center group-hover:bg-ff-primary/80 transition-colors"><ArrowRight className="w-3 h-3" /></span>
+            <button aria-label="See all trainings" className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest hover:opacity-70 group text-ff-primary rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ff-primary focus-visible:ring-offset-4 transition-colors">
+              SEE ALL <span className="w-5 h-5 rounded-full bg-ff-primary text-white flex items-center justify-center group-hover:bg-ff-primary/80 transition-colors"><ArrowRight aria-hidden="true" className="w-3 h-3" /></span>
             </button>
           </div>
 
@@ -154,14 +158,14 @@ export default function LoginView() {
               { title: "GROUP FITNESS CLASSES", img: "https://images.unsplash.com/photo-1548690312-e3b507d8c110?q=80&w=1471&auto=format&fit=crop" },
               { title: "FUNCTIONAL TRAINING", img: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=1470&auto=format&fit=crop" }
             ].map((item, i) => (
-              <div key={i} className="group relative w-full h-[120px] lg:h-[130px] rounded-[1.5rem] lg:rounded-[2rem] overflow-hidden cursor-pointer">
-                <img src={item.img} alt={item.title} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+              <a href={`#training-${i}`} key={i} className="group relative w-full h-[120px] lg:h-[130px] rounded-[1.5rem] lg:rounded-[2rem] overflow-hidden cursor-pointer block focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ff-primary focus-visible:ring-offset-2">
+                <img src={item.img} alt="" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                 <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors"></div>
                 <div className="absolute inset-0 flex items-center justify-between px-6 lg:px-8">
                   <span className="text-white font-impact text-xl lg:text-2xl uppercase tracking-wide">{item.title}</span>
-                  <ArrowRight className="text-white/60 w-5 h-5 lg:w-6 lg:h-6 group-hover:translate-x-1 group-hover:text-white transition-all" />
+                  <ArrowRight aria-hidden="true" className="text-white/60 w-5 h-5 lg:w-6 lg:h-6 group-hover:translate-x-1 group-hover:text-white transition-all" />
                 </div>
-              </div>
+              </a>
             ))}
           </div>
         </section>
@@ -171,13 +175,13 @@ export default function LoginView() {
           <h4 className="text-xl font-impact uppercase tracking-wider mb-6">THE CLUB</h4>
           <div className="flex flex-col">
             {['BASIC', 'PREMIUM', 'ELITE'].map((tier, i) => (
-              <div key={tier} className="flex items-center justify-between py-6 lg:py-8 border-t-[1.5px] border-ff-primary/20 group cursor-pointer hover:bg-ff-primary/5 transition-colors -mx-4 px-4 rounded-xl">
+              <button aria-label={`Select ${tier} tier`} key={tier} className="w-full flex items-center justify-between py-6 lg:py-8 border-t-[1.5px] border-ff-primary/20 group cursor-pointer hover:bg-ff-primary/5 transition-colors -mx-4 px-4 rounded-xl focus-visible:outline-none focus-visible:bg-ff-primary/10 focus-visible:ring-2 focus-visible:ring-ff-primary focus-visible:ring-offset-4">
                 <span className="text-[2.5rem] lg:text-[4rem] leading-none font-impact uppercase tracking-normal text-ff-primary">{tier}</span>
                 <div className="flex items-center gap-10 lg:gap-16">
                   <SparkleIcon className="w-8 h-8 lg:w-10 lg:h-10 text-ff-primary/20 group-hover:text-ff-primary/40 transition-colors" />
-                  <Plus className="w-8 h-8 lg:w-10 lg:h-10 font-light stroke-1 text-ff-primary/40 group-hover:text-ff-primary transition-colors" />
+                  <Plus aria-hidden="true" className="w-8 h-8 lg:w-10 lg:h-10 font-light stroke-1 text-ff-primary/40 group-hover:text-ff-primary transition-colors" />
                 </div>
-              </div>
+              </button>
             ))}
             <div className="border-t-[1.5px] border-ff-primary/20"></div>
           </div>
