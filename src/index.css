@@ -2,36 +2,37 @@
 @import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap');
 
 @theme {
-  /* Page background: soft light blue */
-  --color-ff-bg: #e8f0f5;
+  /* Dark navy background */
+  --color-ff-bg: #f5f8fa;
   
-  /* Cards: white with strong visibility */
+  /* White cards and surfaces */
   --color-ff-surface: #ffffff;
   
-  /* Primary text: dark navy for contrast */
-  --color-ff-text: #0d1b2a;
+  /* Dark navy text */
+  --color-ff-text: #1a2e4a;
   
-  /* Secondary text: dark navy for labels and placeholders */
-  --color-ff-muted: #0d1b2a;
+  /* Muted gray text */
+  --color-ff-muted: #7a9aaa;
   
-  /* Primary brand color: deep teal-blue */
-  --color-ff-primary: #0077b6;
+  /* Primary teal accent */
+  --color-ff-primary: #2ec4b6;
   
-  /* Accent/highlight: deep teal-blue */
-  --color-ff-secondary: #0077b6;
+  /* Secondary teal (darker) */
+  --color-ff-secondary: #1a9e92;
   
-  /* Tertiary: deep teal-blue */
-  --color-ff-tertiary: #0077b6;
+  /* Tertiary orange accent */
+  --color-ff-tertiary: #f4a533;
   
-  /* Quaternary: light blue for selections */
-  --color-ff-quaternary: #0077b6;
+  /* Quaternary color */
+  --color-ff-quaternary: #ffc56a;
 
-  /* Additional colors for empty/filled states */
-  --color-ff-border: #0d1b2a;
-  --color-ff-input-bg: #f0f4f8;
-  --color-ff-input-border: #0d1b2a;
-  --color-ff-empty: #0077b6;
-  --color-ff-filled: #0077b6;
+  /* Additional colors */
+  --color-ff-border: rgba(26,46,74,0.08);
+  --color-ff-input-bg: #f0f7f7;
+  --color-ff-input-border: rgba(46,196,182,0.2);
+  --color-ff-light-bg: #f5fbfb;
+  --color-ff-empty: #2ec4b6;
+  --color-ff-filled: #2ec4b6;
 
   --font-display: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
   --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
@@ -40,19 +41,20 @@
 }
 
 :root.light {
-  --color-ff-bg: #e8f0f5;
+  --color-ff-bg: #f5f8fa;
   --color-ff-surface: #ffffff;
-  --color-ff-text: #0d1b2a;
-  --color-ff-muted: #0d1b2a;
-  --color-ff-primary: #0077b6;
-  --color-ff-secondary: #0077b6;
-  --color-ff-tertiary: #0077b6;
-  --color-ff-quaternary: #0077b6;
-  --color-ff-border: #0d1b2a;
-  --color-ff-input-bg: #f0f4f8;
-  --color-ff-input-border: #0d1b2a;
-  --color-ff-empty: #0077b6;
-  --color-ff-filled: #0077b6;
+  --color-ff-text: #1a2e4a;
+  --color-ff-muted: #7a9aaa;
+  --color-ff-primary: #2ec4b6;
+  --color-ff-secondary: #1a9e92;
+  --color-ff-tertiary: #f4a533;
+  --color-ff-quaternary: #ffc56a;
+  --color-ff-border: rgba(26,46,74,0.08);
+  --color-ff-input-bg: #f0f7f7;
+  --color-ff-input-border: rgba(46,196,182,0.2);
+  --color-ff-light-bg: #f5fbfb;
+  --color-ff-empty: #2ec4b6;
+  --color-ff-filled: #2ec4b6;
 }
 
 body {

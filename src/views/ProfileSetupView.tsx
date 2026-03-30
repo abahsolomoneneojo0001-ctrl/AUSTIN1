@@ -105,48 +105,71 @@ export default function ProfileSetupView({ onComplete }: { onComplete: () => voi
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="text-center space-y-2">
-        <h2 className="text-3xl font-display tracking-wide" style={{ color: 'var(--color-ff-text)' }}>YOUR PROFILE</h2>
-        <p className="text-ff-muted">Help us personalize your AI-generated plans.</p>
+    <div className="max-w-2xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      {/* Hero Section */}
+      <div
+        className="relative overflow-hidden rounded-2xl p-7 md:p-10"
+        style={{ background: 'linear-gradient(135deg, #1a2e4a 0%, #243d5c 60%, #1e3a5c 100%)' }}
+      >
+        <div className="pointer-events-none absolute top-0 right-0 w-72 h-72 rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(46,196,182,0.12) 0%, transparent 70%)', transform: 'translate(30%, -30%)' }} />
+        <div className="pointer-events-none absolute bottom-0 left-1/3 w-48 h-48 rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(46,196,182,0.07) 0%, transparent 70%)', transform: 'translateY(40%)' }} />
+
+        <div className="relative z-10">
+          <p className="text-sm font-medium mb-2" style={{ color: 'rgba(255,255,255,0.5)' }}>Step {step} of 4</p>
+          <h2 className="font-display tracking-wide mb-3" style={{ fontSize: 'clamp(32px,4vw,48px)', color: '#fff' }}>
+            COMPLETE YOUR PROFILE
+          </h2>
+          <p className="text-sm mb-6 max-w-md" style={{ color: 'rgba(255,255,255,0.6)', lineHeight: '1.6' }}>
+            Help us personalize your AI-generated plans with your fitness goals and preferences.
+          </p>
+
+          {/* Progress Indicator */}
+          <div className="flex gap-2">
+            {[1, 2, 3, 4].map((i) => (
+              <div
+                key={i}
+                className="h-1.5 rounded-full transition-all duration-300"
+                style={{
+                  width: i === step ? '32px' : '16px',
+                  background: i <= step ? '#2ec4b6' : 'rgba(255,255,255,0.2)'
+                }}
+              />
+            ))}
+          </div>
+        </div>
       </div>
 
-      <div className="flex items-center justify-center gap-2 mb-8">
-        {[1, 2, 3, 4].map((i) => (
-          <div key={i} className={cn(
-            "h-2 rounded-full transition-all duration-300",
-            i === step ? "w-12 bg-ff-primary" : i < step ? "w-8 bg-ff-primary/50" : "w-8 bg-ff-surface"
-          )} />
-        ))}
-      </div>
-
-      <div className="bg-ff-surface rounded-[24px] p-6 md:p-8 border" style={{ borderColor: 'var(--color-ff-input-border)' }}>
+      <div className="rounded-2xl p-6 md:p-8 bg-white" style={{ border: '1px solid rgba(26,46,74,0.08)', boxShadow: '0 2px 12px rgba(26,46,74,0.05)' }}>
         {step === 1 && (
           <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
             <div className="flex items-center gap-3 mb-6">
-              <User className="w-6 h-6" style={{ color: 'var(--color-ff-primary)' }} />
-              <h3 className="text-xl font-bold" style={{ color: 'var(--color-ff-text)' }}>Personal Details</h3>
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: 'rgba(46,196,182,0.1)' }}>
+                <User className="w-4 h-4" style={{ color: '#2ec4b6' }} />
+              </div>
+              <h3 className="font-display tracking-wide text-lg" style={{ color: '#1a2e4a' }}>Personal Details</h3>
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-xs font-bold text-ff-muted uppercase tracking-wider">Age</label>
+                <label className="text-xs font-bold uppercase tracking-wider" style={{ color: '#7a9aaa' }}>Age</label>
                 <input 
                   type="number" 
                   value={age} 
                   onChange={(e) => setAge(e.target.value)}
-                  className="w-full rounded-xl p-4 focus:outline-none border"
-                  style={{ backgroundColor: 'var(--color-ff-input-bg)', color: 'var(--color-ff-text)', borderColor: 'var(--color-ff-input-border)' }}
+                  className="w-full rounded-xl p-3 text-sm focus:outline-none"
+                  style={{ background: '#f0f7f7', border: '1px solid rgba(46,196,182,0.2)', color: '#1a2e4a' }}
                   placeholder="e.g. 28"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-bold text-ff-muted uppercase tracking-wider">Gender</label>
+                <label className="text-xs font-bold uppercase tracking-wider" style={{ color: '#7a9aaa' }}>Gender</label>
                 <select 
                   value={gender} 
                   onChange={(e) => setGender(e.target.value)}
-                  className="w-full rounded-xl p-4 focus:outline-none appearance-none border"
-                  style={{ backgroundColor: 'var(--color-ff-input-bg)', color: 'var(--color-ff-text)', borderColor: 'var(--color-ff-input-border)' }}
+                  className="w-full rounded-xl p-3 text-sm focus:outline-none appearance-none"
+                  style={{ background: '#f0f7f7', border: '1px solid rgba(46,196,182,0.2)', color: '#1a2e4a' }}
                 >
                   <option value="">Select...</option>
                   <option value="Male">Male</option>
@@ -156,24 +179,24 @@ export default function ProfileSetupView({ onComplete }: { onComplete: () => voi
                 </select>
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-bold text-ff-muted uppercase tracking-wider">Weight (kg)</label>
+                <label className="text-xs font-bold uppercase tracking-wider" style={{ color: '#7a9aaa' }}>Weight (kg)</label>
                 <input 
                   type="number" 
                   value={weight} 
                   onChange={(e) => setWeight(e.target.value)}
-                  className="w-full rounded-xl p-4 focus:outline-none border"
-                  style={{ backgroundColor: 'var(--color-ff-input-bg)', color: 'var(--color-ff-text)', borderColor: 'var(--color-ff-input-border)' }}
+                  className="w-full rounded-xl p-3 text-sm focus:outline-none"
+                  style={{ background: '#f0f7f7', border: '1px solid rgba(46,196,182,0.2)', color: '#1a2e4a' }}
                   placeholder="e.g. 75"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-bold text-ff-muted uppercase tracking-wider">Height (cm)</label>
+                <label className="text-xs font-bold uppercase tracking-wider" style={{ color: '#7a9aaa' }}>Height (cm)</label>
                 <input 
                   type="number" 
                   value={height} 
                   onChange={(e) => setHeight(e.target.value)}
-                  className="w-full rounded-xl p-4 focus:outline-none border"
-                  style={{ backgroundColor: 'var(--color-ff-input-bg)', color: 'var(--color-ff-text)', borderColor: 'var(--color-ff-input-border)' }}
+                  className="w-full rounded-xl p-3 text-sm focus:outline-none"
+                  style={{ background: '#f0f7f7', border: '1px solid rgba(46,196,182,0.2)', color: '#1a2e4a' }}
                   placeholder="e.g. 180"
                 />
               </div>
@@ -184,22 +207,21 @@ export default function ProfileSetupView({ onComplete }: { onComplete: () => voi
         {step === 2 && (
           <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
             <div className="flex items-center gap-3 mb-6">
-              <Target className="w-6 h-6" style={{ color: 'var(--color-ff-primary)' }} />
-              <h3 className="text-xl font-bold" style={{ color: 'var(--color-ff-text)' }}>Fitness Goals</h3>
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: 'rgba(46,196,182,0.1)' }}>
+                <Target className="w-4 h-4" style={{ color: '#2ec4b6' }} />
+              </div>
+              <h3 className="font-display tracking-wide text-lg" style={{ color: '#1a2e4a' }}>Fitness Goals</h3>
             </div>
-            <p className="text-sm text-ff-muted mb-4">Select all that apply.</p>
+            <p className="text-sm mb-4" style={{ color: '#7a9aaa', fontWeight: 500 }}>Select all that apply.</p>
             <div className="flex flex-wrap gap-3">
               {GOAL_OPTIONS.map(goal => (
                 <button
                   key={goal}
                   onClick={() => toggleSelection(goal, goals, setGoals)}
-                  className={cn(
-                    "px-4 py-3 rounded-xl font-bold text-sm transition-all border",
-                    goals.includes(goal) 
-                      ? "border-ff-primary" 
-                      : "bg-ff-surface text-ff-muted border-ff-input-border hover:border-ff-primary/50"
-                  )}
-                  style={goals.includes(goal) ? { backgroundColor: 'var(--color-ff-primary)', color: '#ffffff', borderColor: 'var(--color-ff-primary)' } : { color: 'var(--color-ff-text)' }}
+                  className={cn("px-4 py-2.5 rounded-xl font-semibold text-sm transition-all border")}
+                  style={goals.includes(goal) 
+                    ? { background: 'linear-gradient(135deg, #1a9e92, #2ec4b6)', color: '#fff', border: 'none' }
+                    : { background: '#f0f7f7', color: '#1a2e4a', border: '1px solid rgba(46,196,182,0.15)' }}
                 >
                   {goal}
                 </button>
@@ -211,22 +233,21 @@ export default function ProfileSetupView({ onComplete }: { onComplete: () => voi
         {step === 3 && (
           <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
             <div className="flex items-center gap-3 mb-6">
-              <Activity className="w-6 h-6" style={{ color: 'var(--color-ff-primary)' }} />
-              <h3 className="text-xl font-bold" style={{ color: 'var(--color-ff-text)' }}>Experience Level</h3>
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: 'rgba(46,196,182,0.1)' }}>
+                <Activity className="w-4 h-4" style={{ color: '#2ec4b6' }} />
+              </div>
+              <h3 className="font-display tracking-wide text-lg" style={{ color: '#1a2e4a' }}>Experience Level</h3>
             </div>
-            <p className="text-sm text-ff-muted mb-4">Select one.</p>
+            <p className="text-sm mb-4" style={{ color: '#7a9aaa', fontWeight: 500 }}>Select one.</p>
             <div className="flex flex-col gap-3">
               {EXPERIENCE_OPTIONS.map(level => (
                 <button
                   key={level}
                   onClick={() => toggleSelection(level, [experience], (val) => setExperience(val[0]), true)}
-                  className={cn(
-                    "p-4 rounded-xl font-bold text-left transition-all border flex justify-between items-center",
-                    experience === level 
-                      ? "border-ff-primary" 
-                      : "bg-ff-surface text-ff-muted border-ff-input-border hover:border-ff-primary/50"
-                  )}
-                  style={experience === level ? { backgroundColor: 'var(--color-ff-primary)', color: '#ffffff', borderColor: 'var(--color-ff-primary)' } : { color: 'var(--color-ff-text)' }}
+                  className={cn("p-3 rounded-xl font-semibold text-left transition-all border flex justify-between items-center")}
+                  style={experience === level 
+                    ? { background: 'linear-gradient(135deg, #1a9e92, #2ec4b6)', color: '#fff', border: 'none' }
+                    : { background: '#f0f7f7', color: '#1a2e4a', border: '1px solid rgba(46,196,182,0.15)' }}
                 >
                   {level}
                   {experience === level && <CheckCircle2 className="w-5 h-5" />}
@@ -239,22 +260,21 @@ export default function ProfileSetupView({ onComplete }: { onComplete: () => voi
         {step === 4 && (
           <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
             <div className="flex items-center gap-3 mb-6">
-              <Utensils className="w-6 h-6" style={{ color: 'var(--color-ff-primary)' }} />
-              <h3 className="text-xl font-bold" style={{ color: 'var(--color-ff-text)' }}>Dietary Restrictions</h3>
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: 'rgba(46,196,182,0.1)' }}>
+                <Utensils className="w-4 h-4" style={{ color: '#2ec4b6' }} />
+              </div>
+              <h3 className="font-display tracking-wide text-lg" style={{ color: '#1a2e4a' }}>Dietary Restrictions</h3>
             </div>
-            <p className="text-sm text-ff-muted mb-4">Select all that apply.</p>
+            <p className="text-sm mb-4" style={{ color: '#7a9aaa', fontWeight: 500 }}>Select all that apply.</p>
             <div className="flex flex-wrap gap-3">
               {DIET_OPTIONS.map(option => (
                 <button
                   key={option}
                   onClick={() => toggleSelection(option, diet, setDiet)}
-                  className={cn(
-                    "px-4 py-3 rounded-xl font-bold text-sm transition-all border",
-                    diet.includes(option) 
-                      ? "border-ff-primary" 
-                      : "bg-ff-surface text-ff-muted border-ff-input-border hover:border-ff-primary/50"
-                  )}
-                  style={diet.includes(option) ? { backgroundColor: 'var(--color-ff-primary)', color: '#ffffff', borderColor: 'var(--color-ff-primary)' } : { color: 'var(--color-ff-text)' }}
+                  className={cn("px-4 py-2.5 rounded-xl font-semibold text-sm transition-all border")}
+                  style={diet.includes(option) 
+                    ? { background: 'linear-gradient(135deg, #1a9e92, #2ec4b6)', color: '#fff', border: 'none' }
+                    : { background: '#f0f7f7', color: '#1a2e4a', border: '1px solid rgba(46,196,182,0.15)' }}
                 >
                   {option}
                 </button>
@@ -263,14 +283,14 @@ export default function ProfileSetupView({ onComplete }: { onComplete: () => voi
           </div>
         )}
 
-        <div className="flex flex-col-reverse sm:flex-row justify-between mt-8 pt-6 gap-4 border-t" style={{ borderTopColor: 'var(--color-ff-input-border)' }}>
+        <div className="flex flex-col-reverse sm:flex-row justify-between mt-8 pt-6 gap-4" style={{ borderTop: '1px solid rgba(26,46,74,0.1)' }}>
           <button
             onClick={() => setStep(Math.max(1, step - 1))}
             className={cn(
-              "px-6 py-3 font-bold transition-colors w-full sm:w-auto",
+              "px-6 py-3 font-semibold text-sm rounded-full transition-all w-full sm:w-auto",
               step === 1 && "hidden sm:block sm:invisible"
             )}
-            style={{ color: 'var(--color-ff-text)' }}
+            style={{ color: '#7a9aaa' }}
           >
             Back
           </button>
@@ -278,8 +298,8 @@ export default function ProfileSetupView({ onComplete }: { onComplete: () => voi
           {step < 4 ? (
             <button
               onClick={() => setStep(step + 1)}
-              className="px-8 py-3 font-bold rounded-full hover:opacity-80 transition-colors flex items-center justify-center gap-2 w-full sm:w-auto"
-              style={{ backgroundColor: 'var(--color-ff-primary)', color: '#ffffff' }}
+              className="px-8 py-3 font-bold rounded-full text-sm text-white flex items-center justify-center gap-2 w-full sm:w-auto transition-all hover:-translate-y-0.5"
+              style={{ background: 'linear-gradient(135deg, #1a9e92, #2ec4b6)', boxShadow: '0 4px 16px rgba(46,196,182,0.3)' }}
             >
               Next <ChevronRight className="w-4 h-4" />
             </button>
@@ -287,8 +307,8 @@ export default function ProfileSetupView({ onComplete }: { onComplete: () => voi
             <button
               onClick={handleSave}
               disabled={isSaving}
-              className="px-8 py-3 font-bold rounded-full flex items-center justify-center gap-2 disabled:opacity-50 w-full sm:w-auto transition-colors"
-              style={{ backgroundColor: 'var(--color-ff-primary)', color: '#ffffff' }}
+              className="px-8 py-3 font-bold rounded-full text-sm text-white flex items-center justify-center gap-2 disabled:opacity-50 w-full sm:w-auto transition-all hover:-translate-y-0.5"
+              style={{ background: 'linear-gradient(135deg, #1a9e92, #2ec4b6)', boxShadow: '0 4px 16px rgba(46,196,182,0.3)' }}
             >
               {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
               {isSaving ? 'Saving...' : 'Complete Setup'}
