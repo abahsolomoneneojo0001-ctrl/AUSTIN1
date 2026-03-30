@@ -3,32 +3,34 @@
 
 @theme {
   /* Page background: soft light blue */
-  --color-ff-bg: #e8f4fd;
+  --color-ff-bg: #e8f0f5;
   
   /* Cards: white with strong visibility */
   --color-ff-surface: #ffffff;
   
   /* Primary text: dark navy for contrast */
-  --color-ff-text: #1a2f4a;
+  --color-ff-text: #0d1b2a;
   
-  /* Secondary text: medium navy */
-  --color-ff-muted: #2d4a6b;
+  /* Secondary text: dark navy for labels and placeholders */
+  --color-ff-muted: #0d1b2a;
   
-  /* Primary brand color: medium blue */
+  /* Primary brand color: deep teal-blue */
   --color-ff-primary: #0077b6;
   
-  /* Accent/highlight: bright cyan */
-  --color-ff-secondary: #00b4d8;
+  /* Accent/highlight: deep teal-blue */
+  --color-ff-secondary: #0077b6;
   
-  /* Tertiary: lighter blue */
-  --color-ff-tertiary: #0096c7;
+  /* Tertiary: deep teal-blue */
+  --color-ff-tertiary: #0077b6;
   
-  /* Quaternary: very light blue for empty states */
-  --color-ff-quaternary: #c5dff8;
+  /* Quaternary: light blue for selections */
+  --color-ff-quaternary: #0077b6;
 
   /* Additional colors for empty/filled states */
-  --color-ff-border: #0077b6;
-  --color-ff-empty: #c5dff8;
+  --color-ff-border: #0d1b2a;
+  --color-ff-input-bg: #f0f4f8;
+  --color-ff-input-border: #0d1b2a;
+  --color-ff-empty: #0077b6;
   --color-ff-filled: #0077b6;
 
   --font-display: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
@@ -38,16 +40,18 @@
 }
 
 :root.light {
-  --color-ff-bg: #e8f4fd;
+  --color-ff-bg: #e8f0f5;
   --color-ff-surface: #ffffff;
-  --color-ff-text: #1a2f4a;
-  --color-ff-muted: #2d4a6b;
+  --color-ff-text: #0d1b2a;
+  --color-ff-muted: #0d1b2a;
   --color-ff-primary: #0077b6;
-  --color-ff-secondary: #00b4d8;
-  --color-ff-tertiary: #0096c7;
-  --color-ff-quaternary: #c5dff8;
-  --color-ff-border: #0077b6;
-  --color-ff-empty: #c5dff8;
+  --color-ff-secondary: #0077b6;
+  --color-ff-tertiary: #0077b6;
+  --color-ff-quaternary: #0077b6;
+  --color-ff-border: #0d1b2a;
+  --color-ff-input-bg: #f0f4f8;
+  --color-ff-input-border: #0d1b2a;
+  --color-ff-empty: #0077b6;
   --color-ff-filled: #0077b6;
 }
 
@@ -113,7 +117,7 @@ body {
 /* Navigation contrast */
 .nav-item-active {
   color: var(--color-ff-primary);
-  background-color: var(--color-ff-empty);
+  background-color: transparent;
   border-radius: 8px;
 }
 
