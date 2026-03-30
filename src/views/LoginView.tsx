@@ -171,20 +171,27 @@ export default function LoginView() {
         </section>
 
         {/* The Club */}
-        <section>
-          <h4 className="text-xl font-impact uppercase tracking-wider mb-6">THE CLUB</h4>
-          <div className="flex flex-col">
+        <section aria-labelledby="the-club-heading">
+          <h4 id="the-club-heading" className="text-xl font-impact uppercase tracking-wider mb-6">THE CLUB</h4>
+          <ul className="flex flex-col">
             {['BASIC', 'PREMIUM', 'ELITE'].map((tier, i) => (
-              <button aria-label={`Select ${tier} tier`} key={tier} className="w-full flex items-center justify-between py-6 lg:py-8 border-t-[1.5px] border-ff-primary/20 group cursor-pointer hover:bg-ff-primary/5 transition-colors -mx-4 px-4 rounded-xl focus-visible:outline-none focus-visible:bg-ff-primary/10 focus-visible:ring-2 focus-visible:ring-ff-primary focus-visible:ring-offset-4">
-                <span className="text-[2.5rem] lg:text-[4rem] leading-none font-impact uppercase tracking-normal text-ff-primary">{tier}</span>
-                <div className="flex items-center gap-10 lg:gap-16">
-                  <SparkleIcon className="w-8 h-8 lg:w-10 lg:h-10 text-ff-primary/20 group-hover:text-ff-primary/40 transition-colors" />
-                  <Plus aria-hidden="true" className="w-8 h-8 lg:w-10 lg:h-10 font-light stroke-1 text-ff-primary/40 group-hover:text-ff-primary transition-colors" />
-                </div>
-              </button>
+              <li key={tier} className="list-none w-full">
+                <button 
+                  aria-expanded="false" 
+                  aria-controls={`tier-details-${tier.toLowerCase()}`}
+                  aria-label={`Select ${tier} membership tier`}
+                  className="w-full flex items-center justify-between py-6 lg:py-8 border-t-[1.5px] border-ff-primary/20 group cursor-pointer hover:bg-ff-primary/5 transition-colors -mx-4 px-4 rounded-xl focus-visible:outline-none focus-visible:bg-ff-primary/10 focus-visible:ring-2 focus-visible:ring-ff-primary focus-visible:ring-offset-4"
+                >
+                  <span className="text-[2.5rem] lg:text-[4rem] leading-none font-impact uppercase tracking-normal text-ff-primary">{tier}</span>
+                  <div className="flex items-center gap-10 lg:gap-16">
+                    <SparkleIcon aria-hidden="true" className="w-8 h-8 lg:w-10 lg:h-10 text-ff-primary/20 group-hover:text-ff-primary/40 transition-colors" />
+                    <Plus aria-hidden="true" className="w-8 h-8 lg:w-10 lg:h-10 font-light stroke-1 text-ff-primary/40 group-hover:text-ff-primary transition-colors" />
+                  </div>
+                </button>
+              </li>
             ))}
-            <div className="border-t-[1.5px] border-ff-primary/20"></div>
-          </div>
+            <li role="presentation" className="border-t-[1.5px] border-ff-primary/20" aria-hidden="true"></li>
+          </ul>
         </section>
 
       </div>
