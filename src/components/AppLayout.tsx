@@ -160,10 +160,10 @@ export default function AppLayout({ onLogout, userName, userId }: { onLogout: ()
             onClick={() => setActiveTab('premium')}
             className={cn(
               "w-full flex items-center gap-3 px-4 py-3 rounded-[20px] font-bold transition-all",
-              activeTab === 'premium' ? "bg-ff-surface text-ff-primary" : "text-ff-primary hover:bg-ff-surface"
+              activeTab === 'premium' ? "bg-ff-surface text-ff-primary" : "text-ff-muted hover:text-ff-text hover:bg-ff-surface"
             )}
           >
-            <Crown className="w-5 h-5" />
+            <Crown className={cn("w-5 h-5", activeTab === 'premium' ? "text-ff-primary" : "")} />
             Premium
           </button>
           <button 

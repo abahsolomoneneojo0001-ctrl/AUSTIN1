@@ -199,7 +199,7 @@ export default function ProfileSetupView({ onComplete }: { onComplete: () => voi
                       ? "border-ff-primary" 
                       : "bg-ff-surface text-ff-muted border-ff-input-border hover:border-ff-primary/50"
                   )}
-                  style={goals.includes(goal) ? { backgroundColor: 'var(--color-ff-empty)', color: 'var(--color-ff-primary)' } : {}}
+                  style={goals.includes(goal) ? { backgroundColor: 'var(--color-ff-primary)', color: '#ffffff', borderColor: 'var(--color-ff-primary)' } : { color: 'var(--color-ff-text)' }}
                 >
                   {goal}
                 </button>
@@ -226,7 +226,7 @@ export default function ProfileSetupView({ onComplete }: { onComplete: () => voi
                       ? "border-ff-primary" 
                       : "bg-ff-surface text-ff-muted border-ff-input-border hover:border-ff-primary/50"
                   )}
-                  style={experience === level ? { backgroundColor: 'var(--color-ff-empty)', color: 'var(--color-ff-primary)' } : {}}
+                  style={experience === level ? { backgroundColor: 'var(--color-ff-primary)', color: '#ffffff', borderColor: 'var(--color-ff-primary)' } : { color: 'var(--color-ff-text)' }}
                 >
                   {level}
                   {experience === level && <CheckCircle2 className="w-5 h-5" />}
@@ -254,7 +254,7 @@ export default function ProfileSetupView({ onComplete }: { onComplete: () => voi
                       ? "border-ff-primary" 
                       : "bg-ff-surface text-ff-muted border-ff-input-border hover:border-ff-primary/50"
                   )}
-                  style={diet.includes(option) ? { backgroundColor: 'var(--color-ff-empty)', color: 'var(--color-ff-primary)' } : {}}
+                  style={diet.includes(option) ? { backgroundColor: 'var(--color-ff-primary)', color: '#ffffff', borderColor: 'var(--color-ff-primary)' } : { color: 'var(--color-ff-text)' }}
                 >
                   {option}
                 </button>
