@@ -214,7 +214,7 @@ export default function DashboardView({ onNavigate, userName = "Jacob", userId }
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {/* Hero Section */}
-      <div className="relative overflow-hidden rounded-[20px] bg-ff-surface border border-ff-surface p-6 md:p-8">
+      <div className="relative overflow-hidden rounded-[20px] bg-ff-surface border-2 border-ff-primary p-6 md:p-8">
         <div className="absolute top-0 right-0 -mt-16 -mr-16 w-64 h-64 bg-ff-primary/10 rounded-full blur-3xl pointer-events-none" />
         
         <div className="relative z-10 flex flex-col items-start md:items-center justify-between gap-6 md:flex-row">
@@ -241,15 +241,15 @@ export default function DashboardView({ onNavigate, userName = "Jacob", userId }
       {/* Quick Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: 'Workouts', value: stats.totalWorkouts || 0, icon: Activity, color: 'text-ff-secondary', bg: 'bg-ff-secondary/10' },
-          { label: 'Minutes', value: stats.totalMinutes || 0, icon: Zap, color: 'text-ff-tertiary', bg: 'bg-ff-tertiary/10' },
-          { label: 'Calories', value: stats.caloriesBurned || 0, icon: Target, color: 'text-ff-quaternary', bg: 'bg-ff-quaternary/10' },
-          { label: 'Streak', value: streak || 0, icon: Trophy, color: 'text-ff-primary', bg: 'bg-ff-primary/10' },
+          { label: 'Workouts', value: stats.totalWorkouts || 0, icon: Activity, color: 'text-ff-primary', bg: 'bg-ff-primary' },
+          { label: 'Minutes', value: stats.totalMinutes || 0, icon: Zap, color: 'text-ff-secondary', bg: 'bg-ff-secondary' },
+          { label: 'Calories', value: stats.caloriesBurned || 0, icon: Target, color: 'text-ff-tertiary', bg: 'bg-ff-tertiary' },
+          { label: 'Streak', value: streak || 0, icon: Trophy, color: 'text-ff-primary', bg: 'bg-ff-primary' },
         ].map((stat, i) => (
-          <div key={i} className="p-5 rounded-[20px] bg-ff-surface flex flex-col gap-3">
+          <div key={i} className="p-5 rounded-[20px] bg-ff-surface border-2 border-ff-primary flex flex-col gap-3">
             <div className="flex items-center gap-2">
-              <div className={cn("w-3 h-3 rounded-sm", stat.bg, stat.color)} />
-              <p className="text-2xl font-mono font-bold text-ff-text">{stat.value}</p>
+              <div className={cn("w-3 h-3 rounded-sm", stat.bg, stat.color.replace('text-', 'text-white'))} />
+              <p className="text-2xl font-mono font-bold text-ff-text stat-number">{stat.value}</p>
             </div>
             <p className="text-sm text-ff-muted font-bold">{stat.label}</p>
           </div>
@@ -257,7 +257,7 @@ export default function DashboardView({ onNavigate, userName = "Jacob", userId }
       </div>
 
       {/* Streak Tracker */}
-      <div className="p-6 rounded-[20px] bg-ff-surface cursor-pointer hover:border-ff-primary/30 border border-ff-surface transition-colors" onClick={() => onNavigate('progress')}>
+      <div className="p-6 rounded-[20px] bg-ff-surface cursor-pointer hover:border-ff-secondary border-2 border-ff-primary transition-colors" onClick={() => onNavigate('progress')}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <Flame className={cn("w-6 h-6", streak && streak > 0 ? "text-ff-secondary" : "text-ff-muted")} />
@@ -271,7 +271,7 @@ export default function DashboardView({ onNavigate, userName = "Jacob", userId }
       </div>
 
       {/* AI Workout Plan Section */}
-      <div className="p-6 rounded-[20px] bg-ff-surface border border-ff-surface">
+      <div className="p-6 rounded-[20px] bg-ff-surface border-2 border-ff-primary">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-3">
             <Sparkles className="w-6 h-6 text-ff-tertiary" />
@@ -280,7 +280,7 @@ export default function DashboardView({ onNavigate, userName = "Jacob", userId }
           <button
             onClick={generateAIPlan}
             disabled={isGeneratingPlan}
-            className="px-4 py-2 bg-ff-tertiary/10 text-ff-tertiary font-bold rounded-full hover:bg-ff-tertiary/20 transition-colors flex items-center gap-2 disabled:opacity-50"
+            className="px-4 py-2 bg-ff-primary text-white font-bold rounded-full hover:bg-ff-tertiary transition-colors flex items-center gap-2 disabled:opacity-50"
           >
             {isGeneratingPlan ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
             {isGeneratingPlan ? 'Generating...' : 'Generate Plan'}
@@ -288,18 +288,18 @@ export default function DashboardView({ onNavigate, userName = "Jacob", userId }
         </div>
         
         {aiPlan ? (
-          <div className="prose prose-invert max-w-none prose-p:leading-relaxed prose-a:text-ff-tertiary bg-ff-bg p-6 rounded-xl border border-ff-surface">
+          <div className="prose max-w-none prose-p:leading-relaxed prose-a:text-ff-primary bg-ff-bg p-6 rounded-xl border-2 border-ff-primary text-ff-text">
             <Markdown>{aiPlan}</Markdown>
           </div>
         ) : (
-          <div className="text-center p-8 bg-ff-bg rounded-xl border border-ff-surface">
+          <div className="text-center p-8 bg-ff-bg rounded-xl border-2 border-ff-primary">
             <p className="text-ff-muted">Click "Generate Plan" to get a personalized 7-day workout routine based on your goals and recent activity.</p>
           </div>
         )}
       </div>
 
       {/* Activity History Section */}
-      <div className="rounded-[20px] bg-ff-surface border border-ff-surface overflow-hidden">
+      <div className="rounded-[20px] bg-ff-surface border-2 border-ff-primary overflow-hidden">
         <button 
           onClick={() => setIsHistoryOpen(!isHistoryOpen)}
           className="w-full p-6 flex items-center justify-between hover:bg-ff-surface/80 transition-colors"
@@ -320,7 +320,7 @@ export default function DashboardView({ onNavigate, userName = "Jacob", userId }
                   type="date" 
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="bg-transparent border border-ff-surface rounded-lg px-3 py-2 text-ff-text focus:outline-none focus:border-ff-quaternary"
+                  className="bg-ff-bg border-2 border-ff-primary rounded-lg px-3 py-2 text-ff-text focus:outline-none focus:border-ff-secondary"
                 />
               </div>
               <div className="flex flex-col gap-1">
@@ -329,7 +329,7 @@ export default function DashboardView({ onNavigate, userName = "Jacob", userId }
                   type="date" 
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="bg-transparent border border-ff-surface rounded-lg px-3 py-2 text-ff-text focus:outline-none focus:border-ff-quaternary"
+                  className="bg-ff-bg border-2 border-ff-primary rounded-lg px-3 py-2 text-ff-text focus:outline-none focus:border-ff-secondary"
                 />
               </div>
               <div className="flex items-end pb-1">
@@ -347,11 +347,11 @@ export default function DashboardView({ onNavigate, userName = "Jacob", userId }
             <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
               {filteredActivities.length > 0 ? (
                 filteredActivities.map((activity) => (
-                  <div key={activity.id} className="flex items-center justify-between p-4 bg-ff-bg rounded-xl border border-ff-surface">
+                  <div key={activity.id} className="flex items-center justify-between p-4 bg-ff-surface rounded-xl border-2 border-ff-empty">
                     <div className="flex items-center gap-4">
                       <div className={cn(
-                        "w-10 h-10 rounded-full flex items-center justify-center shrink-0",
-                        activity.type === 'workout' ? "bg-ff-secondary/10 text-ff-secondary" : "bg-ff-tertiary/10 text-ff-tertiary"
+                        "w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-white",
+                        activity.type === 'workout' ? "bg-ff-primary" : "bg-ff-secondary"
                       )}>
                         {activity.type === 'workout' ? <Dumbbell className="w-5 h-5" /> : <Utensils className="w-5 h-5" />}
                       </div>
@@ -380,7 +380,7 @@ export default function DashboardView({ onNavigate, userName = "Jacob", userId }
         <div className="space-y-4">
           <h3 className="text-xl font-display tracking-wide text-ff-text">TODAY'S PLAN</h3>
           
-          <div className="group relative overflow-hidden rounded-[20px] bg-ff-surface border border-ff-surface hover:border-ff-primary/50 transition-all cursor-pointer">
+          <div className="group relative overflow-hidden rounded-[20px] bg-ff-surface border-2 border-ff-primary hover:border-ff-secondary transition-all cursor-pointer">
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent z-10" />
             <img 
               src="https://picsum.photos/seed/workout1/800/400" 

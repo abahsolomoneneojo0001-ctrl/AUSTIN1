@@ -74,12 +74,12 @@ export default function WorkoutsView() {
       )}
       
       {/* Tabs */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4 bg-ff-surface p-2 rounded-2xl w-full sm:w-fit mb-8">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4 bg-ff-surface p-2 rounded-2xl w-full sm:w-fit mb-8 border-2 border-ff-primary">
         <button
           onClick={() => setActiveTab('workouts')}
           className={cn(
             "flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold transition-all w-full sm:w-auto",
-            activeTab === 'workouts' ? "bg-ff-primary text-black shadow-lg" : "text-ff-muted hover:text-white"
+            activeTab === 'workouts' ? "bg-ff-primary text-white shadow-lg" : "text-ff-muted hover:text-ff-text"
           )}
         >
           <List className="w-5 h-5" />
@@ -89,7 +89,7 @@ export default function WorkoutsView() {
           onClick={() => setActiveTab('tracker')}
           className={cn(
             "flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold transition-all w-full sm:w-auto",
-            activeTab === 'tracker' ? "bg-ff-secondary text-black shadow-lg" : "text-ff-muted hover:text-white"
+            activeTab === 'tracker' ? "bg-ff-secondary text-white shadow-lg" : "text-ff-muted hover:text-ff-text"
           )}
         >
           <Dumbbell className="w-5 h-5" />
@@ -107,18 +107,18 @@ export default function WorkoutsView() {
               <input 
                 type="text" 
                 placeholder="Search workouts, exercises..." 
-                className="w-full bg-ff-surface border border-ff-surface rounded-xl py-2.5 pl-10 pr-4 text-ff-text placeholder:text-ff-muted focus:outline-none focus:border-ff-primary focus:ring-1 focus:ring-ff-primary transition-all"
+                className="w-full bg-ff-bg border-2 border-ff-primary rounded-xl py-2.5 pl-10 pr-4 text-ff-text placeholder:text-ff-muted focus:outline-none focus:border-ff-secondary focus:ring-0 transition-all"
               />
             </div>
             <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
               <button 
                 onClick={() => setShowFormCheck(true)}
-                className="flex flex-1 sm:flex-none justify-center items-center gap-2 px-4 py-2.5 bg-ff-primary text-black font-bold rounded-xl hover:bg-ff-primary/80 transition-colors"
+                className="flex flex-1 sm:flex-none justify-center items-center gap-2 px-4 py-2.5 bg-ff-primary text-white font-bold rounded-xl hover:bg-ff-tertiary transition-colors"
               >
                 <Activity className="w-4 h-4" />
                 AI Form Check
               </button>
-              <button className="flex flex-1 sm:flex-none justify-center items-center gap-2 px-4 py-2.5 bg-ff-surface border border-ff-surface rounded-xl text-ff-text hover:bg-ff-surface/80 transition-colors">
+              <button className="flex flex-1 sm:flex-none justify-center items-center gap-2 px-4 py-2.5 bg-ff-surface border-2 border-ff-primary rounded-xl text-ff-text hover:border-ff-secondary transition-colors">
                 <Filter className="w-4 h-4" />
                 Filters
               </button>
@@ -131,10 +131,10 @@ export default function WorkoutsView() {
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
                 className={cn(
-                  "px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all",
+                  "px-5 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all border-2",
                   activeCategory === cat 
-                    ? "bg-ff-primary text-black" 
-                    : "bg-ff-surface text-ff-muted hover:text-ff-text hover:bg-ff-surface/80 border border-ff-surface"
+                    ? "bg-ff-primary text-white border-ff-primary" 
+                    : "bg-ff-surface text-ff-text border-ff-primary hover:bg-ff-empty"
                 )}
               >
                 {cat}
@@ -158,7 +158,7 @@ export default function WorkoutsView() {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute inset-0 z-20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
-                    <div className="w-12 h-12 rounded-full bg-ff-primary flex items-center justify-center text-black transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                    <div className="w-12 h-12 rounded-full bg-ff-primary flex items-center justify-center text-white transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
                       <Play className="w-5 h-5 ml-1" />
                     </div>
                   </div>
@@ -188,7 +188,7 @@ export default function WorkoutsView() {
                       e.stopPropagation();
                       setActiveWorkout(workout);
                     }}
-                    className="w-full py-2.5 bg-ff-primary text-black font-bold rounded-xl hover:bg-ff-primary/80 transition-colors flex items-center justify-center gap-2"
+                    className="w-full py-2.5 bg-ff-primary text-white font-bold rounded-xl hover:bg-ff-tertiary transition-colors flex items-center justify-center gap-2"
                   >
                     <Play className="w-4 h-4 fill-current" />
                     Start Workout

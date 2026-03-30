@@ -2,14 +2,34 @@
 @import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap');
 
 @theme {
-  --color-ff-bg: transparent;
-  --color-ff-surface: rgba(255, 255, 255, 0.5);
-  --color-ff-text: #1c2e4a; /* Dark, muted navy blue */
-  --color-ff-muted: #6b7280; /* Neutral medium gray */
-  --color-ff-primary: #0284c7; /* Sky 600 */
-  --color-ff-secondary: #0ea5e9; /* Sky 500 */
-  --color-ff-tertiary: #7dd3fc; /* Sky 300 */
-  --color-ff-quaternary: #e0f2fe; /* Sky 100 */
+  /* Page background: soft light blue */
+  --color-ff-bg: #e8f4fd;
+  
+  /* Cards: white with strong visibility */
+  --color-ff-surface: #ffffff;
+  
+  /* Primary text: dark navy for contrast */
+  --color-ff-text: #1a2f4a;
+  
+  /* Secondary text: medium navy */
+  --color-ff-muted: #2d4a6b;
+  
+  /* Primary brand color: medium blue */
+  --color-ff-primary: #0077b6;
+  
+  /* Accent/highlight: bright cyan */
+  --color-ff-secondary: #00b4d8;
+  
+  /* Tertiary: lighter blue */
+  --color-ff-tertiary: #0096c7;
+  
+  /* Quaternary: very light blue for empty states */
+  --color-ff-quaternary: #c5dff8;
+
+  /* Additional colors for empty/filled states */
+  --color-ff-border: #0077b6;
+  --color-ff-empty: #c5dff8;
+  --color-ff-filled: #0077b6;
 
   --font-display: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
   --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
@@ -18,24 +38,83 @@
 }
 
 :root.light {
-  --color-ff-bg: transparent;
-  --color-ff-surface: rgba(255, 255, 255, 0.6);
-  --color-ff-text: #1c2e4a;
-  --color-ff-muted: #6b7280;
-  --color-ff-primary: #0284c7;
-  --color-ff-secondary: #0ea5e9;
-  --color-ff-tertiary: #7dd3fc;
-  --color-ff-quaternary: #e0f2fe;
+  --color-ff-bg: #e8f4fd;
+  --color-ff-surface: #ffffff;
+  --color-ff-text: #1a2f4a;
+  --color-ff-muted: #2d4a6b;
+  --color-ff-primary: #0077b6;
+  --color-ff-secondary: #00b4d8;
+  --color-ff-tertiary: #0096c7;
+  --color-ff-quaternary: #c5dff8;
+  --color-ff-border: #0077b6;
+  --color-ff-empty: #c5dff8;
+  --color-ff-filled: #0077b6;
 }
 
 body {
-  background: linear-gradient(135deg, #f0f9ff 0%, #bae6fd 100%);
+  background-color: var(--color-ff-bg);
   background-attachment: fixed;
   color: var(--color-ff-text);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100dvh;
+}
+
+/* Card styling with strong contrast */
+.card-surface {
+  background-color: var(--color-ff-surface);
+  border: 2px solid var(--color-ff-border);
+  color: var(--color-ff-text);
+}
+
+.card-surface:hover {
+  background-color: var(--color-ff-surface);
+  border-color: var(--color-ff-secondary);
+}
+
+/* Empty state styling for water intake, progress blocks, etc. */
+.empty-state {
+  background-color: var(--color-ff-empty);
+  border: 2px solid var(--color-ff-empty);
+  color: var(--color-ff-muted);
+}
+
+/* Filled state styling */
+.filled-state {
+  background-color: var(--color-ff-filled);
+  border: 2px solid var(--color-ff-filled);
+  color: #ffffff;
+}
+
+/* Strong contrast text for important numbers (calorie ring, stats) */
+.stat-number {
+  color: var(--color-ff-text);
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Button overrides for white text on blue */
+.btn-primary {
+  background-color: var(--color-ff-primary);
+  color: #ffffff;
+  font-weight: 700;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #0056a8;
+}
+
+.btn-primary:active {
+  background-color: #003d7f;
+}
+
+/* Navigation contrast */
+.nav-item-active {
+  color: var(--color-ff-primary);
+  background-color: var(--color-ff-empty);
+  border-radius: 8px;
 }
 
 /* Utility classes used across the app (Tailwind doesn't generate arbitrary safety-area helpers by default) */
