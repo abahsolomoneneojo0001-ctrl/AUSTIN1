@@ -25,7 +25,10 @@ export default function ProgressView() {
 
   useEffect(() => {
     const userId = auth.currentUser?.uid;
-    if (!userId) return;
+    if (!userId) {
+      setLoading(false);
+      return;
+    }
 
     let userUnsub: () => void;
     let workoutsUnsub: () => void;
@@ -34,64 +37,70 @@ export default function ProgressView() {
       try {
         // Listen to user stats and connected apps
         userUnsub = onSnapshot(doc(db, 'users', userId), (docSnap) => {
-          if (docSnap.exists()) {
-            const userData = docSnap.data();
-            
-            // Listen to workouts
-            const q = query(collection(db, 'workouts'), where('userId', '==', userId));
-            workoutsUnsub = onSnapshot(q, (snapshot) => {
-              const logs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-              const logDates = logs.map((l: any) => l.date);
-              const streak = calculateStrictStreak(logDates);
+          const userData = docSnap.exists() ? docSnap.data() : {};
+          
+          // Listen to workouts (always set up, even if user doc doesn't exist yet)
+          const q = query(collection(db, 'workouts'), where('userId', '==', userId));
+          workoutsUnsub = onSnapshot(q, (snapshot) => {
+            const logs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+            const logDates = logs.map((l: any) => l.date);
+            const streak = calculateStrictStreak(logDates);
 
-              // Generate chart data
-              const chartData = Array.from({ length: 7 }).map((_, i) => {
-                const d = subDays(new Date(), 6 - i);
-                const dateStr = format(d, 'yyyy-MM-dd');
-                const dayLogs = logs.filter((l: any) => l.date === dateStr);
-                const didWorkout = dayLogs.length > 0;
-                
-                return {
-                  day: format(d, 'EEE'),
-                  date: dateStr,
-                  calories: didWorkout ? dayLogs.reduce((acc: number, curr: any) => acc + (curr.calories || 0), 0) : 0,
-                  minutes: didWorkout ? dayLogs.reduce((acc: number, curr: any) => acc + (parseInt(curr.duration) || 0), 0) : 0,
-                };
-              });
-
-              const currentData = {
-                streak,
-                stats: userData.stats || { totalWorkouts: 0, totalMinutes: 0, caloriesBurned: 0 },
-                connectedApps: userData.connectedApps || { appleHealth: false, googleFit: false },
-                chartData,
-                logs: logs.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()),
-                unlockedAchievements: userData.unlockedAchievements || []
+            // Generate chart data
+            const chartData = Array.from({ length: 7 }).map((_, i) => {
+              const d = subDays(new Date(), 6 - i);
+              const dateStr = format(d, 'yyyy-MM-dd');
+              const dayLogs = logs.filter((l: any) => l.date === dateStr);
+              const didWorkout = dayLogs.length > 0;
+              
+              return {
+                day: format(d, 'EEE'),
+                date: dateStr,
+                calories: didWorkout ? dayLogs.reduce((acc: number, curr: any) => acc + (curr.calories || 0), 0) : 0,
+                minutes: didWorkout ? dayLogs.reduce((acc: number, curr: any) => acc + (parseInt(curr.duration) || 0), 0) : 0,
               };
+            });
 
-              // Check for newly unlocked achievements
-              const newlyUnlocked = ACHIEVEMENTS.filter(ach => 
-                !currentData.unlockedAchievements.includes(ach.id) && ach.condition(currentData)
-              );
+            const currentData = {
+              streak,
+              stats: userData.stats || { totalWorkouts: 0, totalMinutes: 0, caloriesBurned: 0 },
+              connectedApps: userData.connectedApps || { appleHealth: false, googleFit: false },
+              chartData,
+              logs: logs.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+              unlockedAchievements: userData.unlockedAchievements || []
+            };
 
-              if (newlyUnlocked.length > 0) {
-                const updatedUnlocked = [...currentData.unlockedAchievements, ...newlyUnlocked.map(a => a.id)];
-                
-                // Update Firestore
-                updateDoc(doc(db, 'users', userId), {
-                  unlockedAchievements: updatedUnlocked
-                }).catch(err => console.error("Failed to update achievements", err));
+            // Check for newly unlocked achievements
+            const newlyUnlocked = ACHIEVEMENTS.filter(ach => 
+              !currentData.unlockedAchievements.includes(ach.id) && ach.condition(currentData)
+            );
 
-                currentData.unlockedAchievements = updatedUnlocked;
-                setNewAchievements(newlyUnlocked);
-                setShowToast(true);
-                setTimeout(() => setShowToast(false), 5000);
-              }
+            if (newlyUnlocked.length > 0) {
+              const updatedUnlocked = [...currentData.unlockedAchievements, ...newlyUnlocked.map(a => a.id)];
+              
+              // Update Firestore
+              updateDoc(doc(db, 'users', userId), {
+                unlockedAchievements: updatedUnlocked
+              }).catch(err => console.error("Failed to update achievements", err));
 
-              setData(currentData);
-              setLoading(false);
-            }, (error) => handleFirestoreError(error, OperationType.LIST, 'workouts'));
-          }
-        }, (error) => handleFirestoreError(error, OperationType.GET, `users/${userId}`));
+              currentData.unlockedAchievements = updatedUnlocked;
+              setNewAchievements(newlyUnlocked);
+              setShowToast(true);
+              setTimeout(() => setShowToast(false), 5000);
+            }
+
+            setData(currentData);
+            setLoading(false);
+          }, (error) => {
+            console.error("Workouts listener error:", error);
+            setLoading(false);
+            handleFirestoreError(error, OperationType.LIST, 'workouts');
+          });
+        }, (error) => {
+          console.error("User document listener error:", error);
+          setLoading(false);
+          handleFirestoreError(error, OperationType.GET, `users/${userId}`);
+        });
       } catch (err) {
         console.error(err);
         setLoading(false);
