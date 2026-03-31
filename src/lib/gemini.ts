@@ -1,50 +1,54 @@
-import { GoogleGenAI } from "@google/genai";
-
-let aiClient: GoogleGenAI | null = null;
-
-export function getAIClient() {
-  if (!aiClient) {
-    // For Vite, environment variables must be prefixed with VITE_
-    const apiKey = import.meta.env.VITE_GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
-    
-    if (!apiKey) {
-      console.error("❌ VITE_GEMINI_API_KEY is not set. AI features will be disabled.");
-      console.log("💡 To fix: Add VITE_GEMINI_API_KEY to your .env.local file");
-      return null;
-    }
-    
-    console.log("✅ Initializing Gemini AI client...");
-    aiClient = new GoogleGenAI({ apiKey });
+// Get API key from Vite environment variables
+function getApiKey(): string | null {
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+  
+  if (!apiKey) {
+    console.error("❌ VITE_GEMINI_API_KEY is not set. AI features will be disabled.");
+    console.log("💡 To fix: Add VITE_GEMINI_API_KEY to your .env.local file");
+    return null;
   }
-  return aiClient;
+  
+  return apiKey;
 }
 
+const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent";
+
 export async function analyzeMealImage(base64Image: string, mimeType: string) {
-  const ai = getAIClient();
-  if (!ai) return null;
+  const apiKey = getApiKey();
+  if (!apiKey) return null;
 
   try {
-    const response = await ai.models.generateContent({
-      model: "gemini-pro-vision",
-      contents: {
-        parts: [
-          {
-            inlineData: {
-              data: base64Image,
-              mimeType: mimeType,
-            },
-          },
-          {
-            text: "Analyze this meal. Estimate the total calories, protein (g), carbs (g), and fat (g). Return ONLY a JSON object with keys: name (string, short description), calories (number), protein (number), carbs (number), fat (number). Do not include markdown formatting or any other text.",
-          },
-        ],
+    const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-      config: {
-        responseMimeType: "application/json",
-      }
+      body: JSON.stringify({
+        contents: {
+          parts: [
+            {
+              inlineData: {
+                data: base64Image,
+                mimeType: mimeType,
+              },
+            },
+            {
+              text: "Analyze this meal. Estimate the total calories, protein (g), carbs (g), and fat (g). Return ONLY a JSON object with keys: name (string, short description), calories (number), protein (number), carbs (number), fat (number). Do not include markdown formatting or any other text.",
+            },
+          ],
+        },
+      }),
     });
+
+    if (!response.ok) {
+      const error = await response.json();
+      console.error("Meal Analysis Error:", error);
+      return null;
+    }
+
+    const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
     
-    const text = response.text;
     if (!text) return null;
     
     return JSON.parse(text);
@@ -55,8 +59,8 @@ export async function analyzeMealImage(base64Image: string, mimeType: string) {
 }
 
 export async function askFitnessCoach(message: string, context: string = "") {
-  const ai = getAIClient();
-  if (!ai) {
+  const apiKey = getApiKey();
+  if (!apiKey) {
     console.error("AI Client not available - VITE_GEMINI_API_KEY is missing");
     return "AI Coach is currently unavailable. Please check your API key.";
   }
@@ -73,19 +77,46 @@ Please provide a detailed, actionable response (2-3 paragraphs, 200-300 words).`
 
     console.log("Sending request to Gemini API...", { message, context });
 
-    const response = await ai.models.generateContent({
-      model: "gemini-pro",
-      contents: fullPrompt,
+    const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: {
+          parts: [
+            {
+              text: fullPrompt,
+            },
+          ],
+        },
+        generationConfig: {
+          temperature: 0.7,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 1024,
+        },
+      }),
     });
 
-    console.log("Gemini API Response received:", response);
+    if (!response.ok) {
+      const error = await response.json();
+      console.error("Gemini API Error:", error);
+      const errorMsg = error.error?.message || JSON.stringify(error);
+      return `Sorry, API error: ${errorMsg}`;
+    }
 
-    if (!response.text) {
-      console.error("No text in response:", response);
+    const data = await response.json();
+    console.log("Gemini API Response received:", data);
+
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (!text) {
+      console.error("No text in response:", data);
       return "Sorry, I couldn't generate a response. Please try again.";
     }
 
-    return response.text;
+    return text;
   } catch (error) {
     console.error("AI Coach Error:", error);
     const errorMsg = error instanceof Error ? error.message : String(error);
