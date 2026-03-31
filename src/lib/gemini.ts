@@ -25,7 +25,7 @@ export async function analyzeMealImage(base64Image: string, mimeType: string) {
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-pro-vision",
       contents: {
         parts: [
           {
@@ -57,7 +57,7 @@ export async function analyzeMealImage(base64Image: string, mimeType: string) {
 export async function askFitnessCoach(message: string, context: string = "") {
   const ai = getAIClient();
   if (!ai) {
-    console.error("AI Client not available - GEMINI_API_KEY is missing");
+    console.error("AI Client not available - VITE_GEMINI_API_KEY is missing");
     return "AI Coach is currently unavailable. Please check your API key.";
   }
 
@@ -74,7 +74,7 @@ Please provide a detailed, actionable response (2-3 paragraphs, 200-300 words).`
     console.log("Sending request to Gemini API...", { message, context });
 
     const response = await ai.models.generateContent({
-      model: "gemini-1.5-flash",
+      model: "gemini-pro",
       contents: fullPrompt,
     });
 
