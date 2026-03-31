@@ -34,7 +34,16 @@ export default function NavbarDropdown({ loading = false, onLoginClick }: Navbar
 
     try {
       const context = `Provide detailed, actionable fitness advice about "${subtitle}". Keep it concise (2-3 paragraphs), practical, and specific.`;
-      const response = await askFitnessCoach(context);
+      
+      // Add timeout to prevent infinite loading
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Request timeout after 15 seconds')), 15000)
+      );
+      
+      const response = await Promise.race([
+        askFitnessCoach(context),
+        timeoutPromise
+      ]) as string;
       
       setModal(prev => ({
         ...prev,
@@ -42,9 +51,12 @@ export default function NavbarDropdown({ loading = false, onLoginClick }: Navbar
         isLoading: false,
       }));
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+      console.error('Content generation error:', errorMessage);
+      
       setModal(prev => ({
         ...prev,
-        content: 'Sorry, I could not generate content at this time. Please try again.',
+        content: `⚠️ Unable to load content: ${errorMessage}\n\nMake sure your GEMINI_API_KEY environment variable is set correctly and you have an active internet connection.`,
         isLoading: false,
       }));
     }

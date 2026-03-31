@@ -4,11 +4,16 @@ let aiClient: GoogleGenAI | null = null;
 
 export function getAIClient() {
   if (!aiClient) {
-    const apiKey = process.env.GEMINI_API_KEY;
+    // For Vite, environment variables must be prefixed with VITE_
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
+    
     if (!apiKey) {
-      console.warn("GEMINI_API_KEY is missing. AI features will be disabled.");
+      console.error("❌ VITE_GEMINI_API_KEY is not set. AI features will be disabled.");
+      console.log("💡 To fix: Add VITE_GEMINI_API_KEY to your .env.local file");
       return null;
     }
+    
+    console.log("✅ Initializing Gemini AI client...");
     aiClient = new GoogleGenAI({ apiKey });
   }
   return aiClient;
@@ -51,22 +56,39 @@ export async function analyzeMealImage(base64Image: string, mimeType: string) {
 
 export async function askFitnessCoach(message: string, context: string = "") {
   const ai = getAIClient();
-  if (!ai) return "AI Coach is currently unavailable. Please check your API key.";
+  if (!ai) {
+    console.error("AI Client not available - GEMINI_API_KEY is missing");
+    return "AI Coach is currently unavailable. Please check your API key.";
+  }
 
   try {
+    const fullPrompt = `You are a world-class fitness coach, nutritionist, and personal trainer. 
+Your goal is to help the user achieve their fitness goals. 
+Be encouraging, concise, and scientifically accurate.
+User Context: ${context}
+
+User Query: ${message}
+
+Please provide a detailed, actionable response (2-3 paragraphs, 200-300 words).`;
+
+    console.log("Sending request to Gemini API...", { message, context });
+
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
-      contents: message,
-      config: {
-        systemInstruction: `You are a world-class fitness coach, nutritionist, and personal trainer. 
-        Your goal is to help the user achieve their fitness goals. 
-        Be encouraging, concise, and scientifically accurate.
-        User Context: ${context}`,
-      },
+      model: "gemini-1.5-flash",
+      contents: fullPrompt,
     });
-    return response.text || "I'm sorry, I couldn't generate a response.";
+
+    console.log("Gemini API Response received:", response);
+
+    if (!response.text) {
+      console.error("No text in response:", response);
+      return "Sorry, I couldn't generate a response. Please try again.";
+    }
+
+    return response.text;
   } catch (error) {
     console.error("AI Coach Error:", error);
-    return "Sorry, I'm having trouble connecting to my brain right now. Please try again later.";
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    return `Sorry, I'm having trouble connecting to the fitness coach right now. Error: ${errorMsg}`;
   }
 }
