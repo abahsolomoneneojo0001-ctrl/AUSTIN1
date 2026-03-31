@@ -1,13 +1,26 @@
 // Get API key from Vite environment variables
 function getApiKey(): string | null {
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+  // Try multiple ways to access the API key
+  let apiKey = (import.meta.env as any).VITE_GEMINI_API_KEY || 
+               (window as any).__VITE_GEMINI_API_KEY ||
+               (process.env as any).VITE_GEMINI_API_KEY;
   
-  if (!apiKey) {
-    console.error("❌ VITE_GEMINI_API_KEY is not set. AI features will be disabled.");
-    console.log("💡 To fix: Add VITE_GEMINI_API_KEY to your .env.local file");
+  // Remove quotes if present
+  if (apiKey && typeof apiKey === 'string') {
+    apiKey = apiKey.replace(/^["']|["']$/g, '');
+  }
+  
+  if (!apiKey || apiKey.includes('your_api_key')) {
+    console.error("❌ VITE_GEMINI_API_KEY is not properly set.");
+    console.log("💡 Environment:", {
+      importMetaEnv: (import.meta.env as any).VITE_GEMINI_API_KEY,
+      windowVar: (window as any).__VITE_GEMINI_API_KEY,
+      processEnv: (process.env as any).VITE_GEMINI_API_KEY,
+    });
     return null;
   }
   
+  console.log("✅ API Key found:", apiKey.substring(0, 15) + "...");
   return apiKey;
 }
 
