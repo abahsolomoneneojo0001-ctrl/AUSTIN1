@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Play, ArrowRight, Plus, Loader2, Eye, EyeOff, Mail } from 'lucide-react';
 import { signInWithGoogle, signInWithEmailPassword, signUpWithEmailPassword } from '../lib/firebase';
+import NavbarDropdown from '../components/NavbarDropdown';
 
 const SparkleIcon = ({ className = "w-8 h-8" }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -118,32 +119,9 @@ export default function LoginView() {
 
   return (
     <div className="min-h-[100dvh] bg-transparent text-ff-text font-sans selection:bg-ff-primary selection:text-white">
-      <div className="max-w-[1400px] mx-auto px-4 md:px-8 pt-6">
-        
-        {/* Navbar */}
-        <nav aria-label="Main Navigation" className="flex items-center justify-between mb-20 lg:mb-28">
-          <div className="flex items-center gap-2">
-            <a href="/" className="rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ff-primary focus-visible:ring-offset-2 focus-visible:ring-offset-transparent">
-              <img src="/logo.jpeg" alt="AUSTIN FITNESS - Return to Homepage" className="h-10 md:h-12 object-contain" />
-            </a>
-          </div>
-          <ul className="hidden md:flex items-center gap-10 text-[13px] font-semibold text-ff-text/80">
-            <li><a href="#about" className="hover:text-ff-primary rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ff-primary focus-visible:ring-offset-4 focus-visible:ring-offset-transparent transition-colors">About</a></li>
-            <li><a href="#trainings" className="hover:text-ff-primary rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ff-primary focus-visible:ring-offset-4 focus-visible:ring-offset-transparent transition-colors">Trainings</a></li>
-            <li><a href="#testimonials" className="hover:text-ff-primary rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ff-primary focus-visible:ring-offset-4 focus-visible:ring-offset-transparent transition-colors">Testimonials</a></li>
-            <li><a href="#contacts" className="hover:text-ff-primary rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ff-primary focus-visible:ring-offset-4 focus-visible:ring-offset-transparent transition-colors">Contacts</a></li>
-          </ul>
-          <button 
-            onClick={() => setShowLoginModal(true)} 
-            disabled={loading}
-            aria-busy={loading}
-            className="border border-ff-primary text-ff-primary rounded-full px-6 py-2.5 text-[11px] font-bold uppercase tracking-widest hover:bg-ff-primary hover:text-white transition-colors flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ff-primary focus-visible:ring-offset-4 focus-visible:ring-offset-transparent"
-          >
-            {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" aria-hidden="true" /> : "LOGIN"}
-          </button>
-        </nav>
-
-        {/* Hero Text */}
+      <NavbarDropdown loading={loading} onLoginClick={() => setShowLoginModal(true)} />
+      
+      <div className="max-w-[1400px] mx-auto px-4 md:px-8 pt-6" style={{ marginTop: '68px' }}>
         <div className="text-center mb-8 flex flex-col items-center">
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-4">Achieve Your Fitness Goals</p>
           <h1 className="text-[13vw] lg:text-[180px] leading-[0.8] font-impact uppercase">
