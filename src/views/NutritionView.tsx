@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Plus, Utensils, Droplet, Coffee, Camera, Loader2, Sparkles, Zap, X } from 'lucide-react';
 import { cn } from '../lib/utils';
-import { analyzeMealImage } from '../lib/gemini';
+import { analyzeMealImage, askFitnessCoach } from '../lib/gemini';
 import { db, auth, handleFirestoreError, OperationType } from '../lib/firebase';
 import { collection, query, where, onSnapshot, addDoc, serverTimestamp, doc, getDoc } from 'firebase/firestore';
 import { format } from 'date-fns';
@@ -58,9 +58,6 @@ export default function NutritionView() {
 
     setIsGeneratingPlan(true);
     try {
-      const ai = getAIClient();
-      if (!ai) throw new Error("AI client not initialized.");
-
       // Fetch user profile
       const userDoc = await getDoc(doc(db, 'users', userId));
       const userProfile = userDoc.exists() ? userDoc.data() : null;
@@ -77,22 +74,14 @@ export default function NutritionView() {
       }
 
       const recentMeals = meals.slice(0, 5);
-      const mealContext = recentMeals.length > 0 
+      const mealContext = recentMeals.length > 0
         ? `Recent meals today: ${recentMeals.map(m => `${m.name} (${m.calories} kcal)`).join(', ')}.`
         : "No meals logged today.";
 
-      const prompt = `You are an expert AI nutritionist. Generate a personalized 1-day meal plan and general diet recommendations for the user.
-      ${profileContext}
-      ${mealContext}
-      Consider their current goals, personal details, and strictly adhere to any dietary restrictions. Provide a balanced routine including breakfast, lunch, dinner, and snacks.
-      Format the response in clean Markdown.`;
+      const prompt = `Generate a personalized 1-day meal plan and general diet recommendations. ${profileContext} ${mealContext} Consider their current goals, personal details, and strictly adhere to any dietary restrictions. Provide a balanced routine including breakfast, lunch, dinner, and snacks. Format the response in clean Markdown.`;
 
-      const response = await ai.models.generateContent({
-        model: 'gemini-3.1-pro-preview',
-        contents: prompt,
-      });
-
-      setAiDietPlan(response.text || "Could not generate plan.");
+      const response = await askFitnessCoach(prompt);
+      setAiDietPlan(response || "Could not generate plan.");
     } catch (error) {
       console.error("Failed to generate AI diet plan:", error);
       alert("Failed to generate AI diet plan. Please try again.");

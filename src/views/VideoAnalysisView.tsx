@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Play, Upload, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { askFitnessCoach } from '../lib/gemini';
 import Markdown from 'react-markdown';
 
 export default function VideoAnalysisView() {
@@ -26,37 +27,15 @@ export default function VideoAnalysisView() {
 
   const analyzeVideo = async () => {
     if (!video) return;
-    
+
     setIsAnalyzing(true);
     setError(null);
     setResult(null);
 
     try {
-      const ai = getAIClient();
-      if (!ai) throw new Error("AI client not initialized.");
-      
-      const base64Data = video.split(',')[1];
-      const mimeType = video.split(';')[0].split(':')[1];
-
-      const response = await ai.models.generateContent({
-        model: 'gemini-3.1-pro-preview',
-        contents: {
-          parts: [
-            {
-              inlineData: {
-                data: base64Data,
-                mimeType: mimeType,
-              },
-            },
-            {
-              text: "Analyze this workout video. Identify the exercise being performed. Provide a detailed form check, pointing out what the person is doing right and what they need to improve to avoid injury and maximize gains. Be specific and constructive.",
-            },
-          ],
-        },
-      });
-
-      setResult(response.text || "Could not analyze the video.");
-
+      const prompt = "Analyze this workout video: Identify the exercise being performed. Provide a detailed form check, pointing out what the person is doing right and what they need to improve to avoid injury and maximize gains. Be specific and constructive.";
+      const response = await askFitnessCoach(prompt);
+      setResult(response || "Could not analyze the video.");
     } catch (err: any) {
       console.error("Video analysis failed:", err);
       setError(err.message || "Failed to analyze video.");

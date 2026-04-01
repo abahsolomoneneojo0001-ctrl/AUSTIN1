@@ -4,6 +4,7 @@ import { cn, calculateStrictStreak } from '../lib/utils';
 import { db, auth, handleFirestoreError, OperationType } from '../lib/firebase';
 import { collection, query, where, getDocs, onSnapshot, addDoc, serverTimestamp, doc, updateDoc, increment } from 'firebase/firestore';
 import { format, isWithinInterval, parseISO, startOfDay, endOfDay } from 'date-fns';
+import { askFitnessCoach } from '../lib/gemini';
 import Markdown from 'react-markdown';
 
 export default function DashboardView({ onNavigate, userName = "Jacob", userId }: { onNavigate: (tab: any) => void, userName?: string, userId?: string }) {
@@ -129,9 +130,6 @@ export default function DashboardView({ onNavigate, userName = "Jacob", userId }
   const generateAIPlan = async () => {
     setIsGeneratingPlan(true);
     try {
-      const ai = getAIClient();
-      if (!ai) throw new Error("AI client not initialized.");
-
       const recentWorkouts = activities.filter(a => a.type === 'workout').slice(0, 5);
       const workoutContext = recentWorkouts.length > 0
         ? `Recent workouts: ${recentWorkouts.map(w => w.title).join(', ')}.`
@@ -146,18 +144,10 @@ export default function DashboardView({ onNavigate, userName = "Jacob", userId }
         if (dietaryRestrictions) profileContext += `\nDietary Restrictions: ${dietaryRestrictions}.`;
       }
 
-      const prompt = `You are an expert AI fitness coach. Generate a personalized 7-day workout plan for ${userName}. 
-      ${profileContext}
-      ${workoutContext}
-      Consider their current activity level, goals, and any dietary restrictions to provide a balanced routine including strength, cardio, and active recovery.
-      Format the response in clean Markdown.`;
+      const prompt = `Generate a personalized 7-day workout plan. ${profileContext} ${workoutContext}. Consider their current activity level, goals, and any dietary restrictions to provide a balanced routine including strength, cardio, and active recovery. Format the response in clean Markdown.`;
 
-      const response = await ai.models.generateContent({
-        model: 'gemini-3.1-pro-preview',
-        contents: prompt,
-      });
-
-      setAiPlan(response.text || "Could not generate plan.");
+      const response = await askFitnessCoach(prompt);
+      setAiPlan(response || "Could not generate plan.");
     } catch (error) {
       console.error("Failed to generate AI plan:", error);
       alert("Failed to generate AI plan. Please try again.");

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Search, Loader2, ExternalLink } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { askFitnessCoach } from '../lib/gemini';
 import Markdown from 'react-markdown';
 
 export default function FitnessNewsView() {
@@ -12,39 +13,15 @@ export default function FitnessNewsView() {
 
   const handleSearch = async () => {
     if (!query) return;
-    
+
     setIsSearching(true);
     setError(null);
     setResult(null);
     setSources([]);
 
     try {
-      const ai = getAIClient();
-      if (!ai) throw new Error("AI client not initialized.");
-
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: query,
-        config: {
-          tools: [{ googleSearch: {} }],
-        }
-      });
-
-      setResult(response.text || "No information found.");
-
-      const chunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks;
-      if (chunks) {
-        const extractedSources = chunks
-          .filter((c: any) => c.web?.uri && c.web?.title)
-          .map((c: any) => ({ uri: c.web.uri, title: c.web.title }));
-        
-        // Deduplicate sources
-        const uniqueSources = Array.from(new Set(extractedSources.map(s => s.uri)))
-          .map(uri => extractedSources.find(s => s.uri === uri));
-          
-        setSources(uniqueSources);
-      }
-
+      const response = await askFitnessCoach(query);
+      setResult(response || "No information found.");
     } catch (err: any) {
       console.error("Search failed:", err);
       setError(err.message || "Failed to fetch news.");

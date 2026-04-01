@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MapPin, Loader2, ExternalLink, Navigation, Search } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { askFitnessCoach } from '../lib/gemini';
 import Markdown from 'react-markdown';
 
 export default function LocalGymsView() {
@@ -29,49 +30,15 @@ export default function LocalGymsView() {
 
   const handleSearch = async () => {
     if (!query) return;
-    
+
     setIsSearching(true);
     setError(null);
     setResult(null);
     setPlaces([]);
 
     try {
-      const ai = getAIClient();
-      if (!ai) throw new Error("AI client not initialized.");
-
-      const config: any = {
-        tools: [{ googleMaps: {} }],
-      };
-
-      if (location) {
-        config.toolConfig = {
-          retrievalConfig: {
-            latLng: location
-          }
-        };
-      }
-
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: query,
-        config
-      });
-
-      setResult(response.text || "No information found.");
-
-      const chunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks;
-      if (chunks) {
-        const extractedPlaces = chunks
-          .filter((c: any) => c.maps?.uri && c.maps?.title)
-          .map((c: any) => ({ uri: c.maps.uri, title: c.maps.title }));
-        
-        // Deduplicate
-        const uniquePlaces = Array.from(new Set(extractedPlaces.map(p => p.uri)))
-          .map(uri => extractedPlaces.find(p => p.uri === uri));
-          
-        setPlaces(uniquePlaces);
-      }
-
+      const response = await askFitnessCoach(query);
+      setResult(response || "No information found.");
     } catch (err: any) {
       console.error("Search failed:", err);
       setError(err.message || "Failed to find locations.");
