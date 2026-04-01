@@ -4,7 +4,6 @@ import { cn, calculateStrictStreak } from '../lib/utils';
 import { db, auth, handleFirestoreError, OperationType } from '../lib/firebase';
 import { collection, query, where, getDocs, onSnapshot, addDoc, serverTimestamp, doc, updateDoc, increment } from 'firebase/firestore';
 import { format, isWithinInterval, parseISO, startOfDay, endOfDay } from 'date-fns';
-import { getAIClient } from '../lib/gemini';
 import Markdown from 'react-markdown';
 
 export default function DashboardView({ onNavigate, userName = "Jacob", userId }: { onNavigate: (tab: any) => void, userName?: string, userId?: string }) {

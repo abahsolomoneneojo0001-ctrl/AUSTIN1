@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Mic, Video, Image as ImageIcon, Search, MapPin, MessageSquare, Zap, Play } from 'lucide-react';
 import { cn } from '../lib/utils';
-import { getAIClient } from '../lib/gemini';
 import LiveCoachView from './LiveCoachView';
 import VeoVideoView from './VeoVideoView';
 import ImageGenView from './ImageGenView';

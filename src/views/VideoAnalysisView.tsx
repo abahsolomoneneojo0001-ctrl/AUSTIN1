@@ -1,7 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Play, Upload, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { cn } from '../lib/utils';
-import { getAIClient } from '../lib/gemini';
 import Markdown from 'react-markdown';
 
 export default function VideoAnalysisView() {

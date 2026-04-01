@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageSquare, Send, Loader2, User, Bot } from 'lucide-react';
 import { cn } from '../lib/utils';
-import { getAIClient } from '../lib/gemini';
+import { askFitnessCoach } from '../lib/gemini';
 import Markdown from 'react-markdown';
 
 export default function ChatbotView() {
@@ -19,23 +19,9 @@ export default function ChatbotView() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
-  const initChat = () => {
-    if (!chatRef.current) {
-      const ai = getAIClient();
-      if (ai) {
-        chatRef.current = ai.chats.create({
-          model: 'gemini-3.1-pro-preview',
-          config: {
-            systemInstruction: "You are a highly knowledgeable, encouraging, and professional personal fitness trainer. Provide detailed, accurate, and safe advice on exercise, nutrition, and wellness.",
-          }
-        });
-      }
-    }
-  };
-
   const handleSend = async () => {
     if (!input.trim()) return;
-    
+
     const userMessage = input.trim();
     setInput('');
     setMessages(prev => [...prev, { role: 'user', text: userMessage }]);
@@ -43,17 +29,11 @@ export default function ChatbotView() {
     setError(null);
 
     try {
-      initChat();
-      if (!chatRef.current) throw new Error("AI client not initialized.");
-
-      const response = await chatRef.current.sendMessage({ message: userMessage });
-      
-      setMessages(prev => [...prev, { role: 'model', text: response.text || "I'm not sure how to respond to that." }]);
-
+      const response = await askFitnessCoach(userMessage);
+      setMessages(prev => [...prev, { role: 'model', text: response }]);
     } catch (err: any) {
       console.error("Chat error:", err);
       setError(err.message || "Failed to send message.");
-      // Remove the user message if it failed, or just show error
     } finally {
       setIsTyping(false);
     }

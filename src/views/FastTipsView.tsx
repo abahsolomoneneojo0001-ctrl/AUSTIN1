@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Zap, Loader2, Send } from 'lucide-react';
 import { cn } from '../lib/utils';
-import { getAIClient } from '../lib/gemini';
+import { askFitnessCoach } from '../lib/gemini';
 import Markdown from 'react-markdown';
 
 export default function FastTipsView() {
@@ -12,22 +12,14 @@ export default function FastTipsView() {
 
   const getTip = async () => {
     if (!query) return;
-    
+
     setIsGenerating(true);
     setError(null);
     setResult(null);
 
     try {
-      const ai = getAIClient();
-      if (!ai) throw new Error("AI client not initialized.");
-
-      const response = await ai.models.generateContent({
-        model: 'gemini-3.1-flash-lite-preview',
-        contents: `Provide a quick, actionable fitness tip or answer regarding: ${query}. Keep it under 3 sentences.`,
-      });
-
-      setResult(response.text || "No tip generated.");
-
+      const response = await askFitnessCoach(`Provide a quick, actionable fitness tip or answer regarding: ${query}. Keep it under 3 sentences.`);
+      setResult(response);
     } catch (err: any) {
       console.error("Tip generation failed:", err);
       setError(err.message || "Failed to get tip.");

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Plus, Utensils, Droplet, Coffee, Camera, Loader2, Sparkles, Zap, X } from 'lucide-react';
 import { cn } from '../lib/utils';
-import { analyzeMealImage, getAIClient } from '../lib/gemini';
+import { analyzeMealImage } from '../lib/gemini';
 import { db, auth, handleFirestoreError, OperationType } from '../lib/firebase';
 import { collection, query, where, onSnapshot, addDoc, serverTimestamp, doc, getDoc } from 'firebase/firestore';
 import { format } from 'date-fns';
