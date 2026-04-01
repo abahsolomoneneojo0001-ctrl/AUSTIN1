@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Loader2, X } from 'lucide-react';
+import { Loader2, X, MapPin, Phone, Mail, Calendar } from 'lucide-react';
 import { askFitnessCoach } from '../lib/gemini';
 import './navbar.css';
 
@@ -14,6 +14,23 @@ interface ContentModal {
   content: string;
   isLoading: boolean;
 }
+
+// Brand Information
+const BRAND_INFO = {
+  name: 'AUSTIN FITNESS',
+  tagline: 'Transform Your Body, Transform Your Life',
+  description: 'Premier fitness training and coaching services',
+  contact: {
+    phone: '(555) 123-4567',
+    email: 'info@austinfitness.com',
+    address: '123 Fitness Boulevard, Austin, TX 78701'
+  },
+  social: {
+    instagram: '@austinfitness',
+    facebook: 'Austin Fitness',
+    twitter: '@austinfitness'
+  }
+};
 
 export default function NavbarDropdown({ loading = false, onLoginClick }: NavbarDropdownProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -59,6 +76,24 @@ export default function NavbarDropdown({ loading = false, onLoginClick }: Navbar
         content: `⚠️ Unable to load content: ${errorMessage}\n\nMake sure your GEMINI_API_KEY environment variable is set correctly and you have an active internet connection.`,
         isLoading: false,
       }));
+    }
+  };
+
+  const handleContactAction = (type: 'phone' | 'email' | 'location' | 'calendar') => {
+    switch(type) {
+      case 'phone':
+        window.location.href = `tel:${BRAND_INFO.contact.phone}`;
+        break;
+      case 'email':
+        window.location.href = `mailto:${BRAND_INFO.contact.email}`;
+        break;
+      case 'location':
+        window.open(`https://maps.google.com/?q=${encodeURIComponent(BRAND_INFO.contact.address)}`, '_blank');
+        break;
+      case 'calendar':
+        // Placeholder for calendar booking integration
+        alert('Schedule your training session! Coming soon: Calendar integration.');
+        break;
     }
   };
 
@@ -187,9 +222,13 @@ export default function NavbarDropdown({ loading = false, onLoginClick }: Navbar
   return (
     <nav className="navbar" ref={containerRef}>
       <div className="navbar-container">
-        {/* Logo */}
-        <a href="/" className="navbar-logo">
-          <img src="/logo.jpeg" alt="AUSTIN FITNESS - Return to Homepage" />
+        {/* Logo with Brand Info */}
+        <a href="/" className="navbar-logo" title={BRAND_INFO.tagline}>
+          <img src="/logo.jpeg" alt={`${BRAND_INFO.name} - ${BRAND_INFO.tagline}`} />
+          <div className="logo-text-wrapper" style={{ display: 'flex', flexDirection: 'column', marginLeft: '0.5rem' }}>
+            <span style={{ fontSize: '0.875rem', fontWeight: 'bold', lineHeight: '1' }}>{BRAND_INFO.name}</span>
+            <span style={{ fontSize: '0.625rem', color: '#666', lineHeight: '1.2' }}>{BRAND_INFO.tagline}</span>
+          </div>
         </a>
 
         {/* Hamburger Menu */}
@@ -211,12 +250,19 @@ export default function NavbarDropdown({ loading = false, onLoginClick }: Navbar
             </button>
             <div className="dropdown-menu">
               <div className="dropdown-section">
-                <div className="dropdown-section-label">About</div>
+                <div className="dropdown-section-label">{BRAND_INFO.name}</div>
                 <button className="dropdown-item" aria-label="Learn our fitness story">
                   <span className="dropdown-item-icon">📖</span>
                   <div className="dropdown-item-content">
                     <p className="dropdown-item-title">Our Story</p>
                     <p className="dropdown-item-subtitle">Learn our journey</p>
+                  </div>
+                </button>
+                <button className="dropdown-item" aria-label="Our mission statement">
+                  <span className="dropdown-item-icon">🎯</span>
+                  <div className="dropdown-item-content">
+                    <p className="dropdown-item-title">Our Mission</p>
+                    <p className="dropdown-item-subtitle">{BRAND_INFO.tagline}</p>
                   </div>
                 </button>
                 <button className="dropdown-item" aria-label="Meet expert coaches and trainers">
@@ -226,13 +272,6 @@ export default function NavbarDropdown({ loading = false, onLoginClick }: Navbar
                     <p className="dropdown-item-subtitle">Expert coaches & trainers</p>
                   </div>
                 </button>
-                <button className="dropdown-item" aria-label="Learn about our fitness mission">
-                  <span className="dropdown-item-icon">🎯</span>
-                  <div className="dropdown-item-content">
-                    <p className="dropdown-item-title">Our Mission</p>
-                    <p className="dropdown-item-subtitle">What drives us forward</p>
-                  </div>
-                </button>
                 <button className="dropdown-item" aria-label="Read latest fitness announcements">
                   <span className="dropdown-item-icon">📰</span>
                   <div className="dropdown-item-content">
@@ -240,6 +279,14 @@ export default function NavbarDropdown({ loading = false, onLoginClick }: Navbar
                     <p className="dropdown-item-subtitle">Latest announcements</p>
                   </div>
                 </button>
+              </div>
+              <div className="dropdown-section">
+                <div className="dropdown-section-label">Why Choose Us</div>
+                <div className="dropdown-section-info">
+                  <p className="text-sm text-slate-600 mb-2">✓ Expert certified trainers</p>
+                  <p className="text-sm text-slate-600 mb-2">✓ Personalized training programs</p>
+                  <p className="text-sm text-slate-600">✓ AI-powered fitness guidance</p>
+                </div>
               </div>
             </div>
           </li>
@@ -358,34 +405,57 @@ export default function NavbarDropdown({ loading = false, onLoginClick }: Navbar
             <div className="dropdown-menu">
               <div className="dropdown-section">
                 <div className="dropdown-section-label">Get in Touch</div>
-                <button className="dropdown-item" aria-label="Find our gym location">
+                <button 
+                  className="dropdown-item" 
+                  aria-label="Find our gym location"
+                  onClick={() => handleContactAction('location')}
+                >
                   <span className="dropdown-item-icon">📍</span>
                   <div className="dropdown-item-content">
                     <p className="dropdown-item-title">Find Us</p>
-                    <p className="dropdown-item-subtitle">Visit our location</p>
+                    <p className="dropdown-item-subtitle">{BRAND_INFO.contact.address}</p>
                   </div>
                 </button>
-                <button className="dropdown-item" aria-label="Call us for more information">
+                <button 
+                  className="dropdown-item" 
+                  aria-label="Call us for more information"
+                  onClick={() => handleContactAction('phone')}
+                >
                   <span className="dropdown-item-icon">☎️</span>
                   <div className="dropdown-item-content">
                     <p className="dropdown-item-title">Call Us</p>
-                    <p className="dropdown-item-subtitle">Speak with our team</p>
+                    <p className="dropdown-item-subtitle">{BRAND_INFO.contact.phone}</p>
                   </div>
                 </button>
-                <button className="dropdown-item" aria-label="Send us an email">
+                <button 
+                  className="dropdown-item" 
+                  aria-label="Send us an email"
+                  onClick={() => handleContactAction('email')}
+                >
                   <span className="dropdown-item-icon">✉️</span>
                   <div className="dropdown-item-content">
                     <p className="dropdown-item-title">Email Us</p>
-                    <p className="dropdown-item-subtitle">Send us a message</p>
+                    <p className="dropdown-item-subtitle">{BRAND_INFO.contact.email}</p>
                   </div>
                 </button>
-                <button className="dropdown-item" aria-label="Schedule a training session">
+                <button 
+                  className="dropdown-item" 
+                  aria-label="Schedule a training session"
+                  onClick={() => handleContactAction('calendar')}
+                >
                   <span className="dropdown-item-icon">📅</span>
                   <div className="dropdown-item-content">
                     <p className="dropdown-item-title">Book a Session</p>
                     <p className="dropdown-item-subtitle">Schedule your training</p>
                   </div>
                 </button>
+              </div>
+              <div className="dropdown-section">
+                <div className="dropdown-section-label">Follow Us</div>
+                <div className="dropdown-section-info">
+                  <p className="text-sm text-slate-600 mb-2">{BRAND_INFO.social.instagram}</p>
+                  <p className="text-sm text-slate-600">{BRAND_INFO.social.facebook}</p>
+                </div>
               </div>
             </div>
           </li>

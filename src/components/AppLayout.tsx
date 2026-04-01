@@ -126,7 +126,27 @@ export default function AppLayout({ onLogout, userName, userId }: { onLogout: ()
 
   console.log('AppLayout: rendering main layout, activeTab:', activeTab);
   return (
-    <div className="flex min-h-[100dvh] w-full bg-ff-bg text-ff-text overflow-hidden font-sans">
+    <div className="flex flex-col min-h-[100dvh] w-full bg-ff-bg text-ff-text overflow-hidden font-sans">
+      {/* Brand Navbar */}
+      <nav className="hidden md:flex items-center justify-between px-6 py-3 bg-gradient-to-r from-ff-primary to-ff-secondary border-b border-ff-surface/50">
+        <div className="flex items-center gap-3">
+          <img src="/logo.jpeg" alt="Austin Fitness" className="h-10 object-contain drop-shadow-md" />
+          <div className="flex flex-col">
+            <span className="text-white font-bold text-lg leading-tight">AUSTIN FITNESS</span>
+            <span className="text-white/80 text-xs font-medium">Your Personal Fitness Journey</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-6 text-white text-sm font-medium">
+          <button onClick={() => setActiveTab('dashboard')} className="hover:text-white/70 transition-colors">Home</button>
+          <button onClick={() => setActiveTab('coaches')} className="hover:text-white/70 transition-colors">Coaching</button>
+          <button onClick={() => setActiveTab('ai-hub')} className="hover:text-white/70 transition-colors">AI Hub</button>
+          <span className="text-white/40">|</span>
+          <span className="text-white/70">Welcome, {userName}!</span>
+        </div>
+      </nav>
+
+      {/* Main Layout */}
+      <div className="flex flex-1 min-h-0 overflow-hidden">
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex flex-col w-64 border-r border-ff-surface bg-ff-bg">
         <div className="px-4 pt-6 pb-2 flex items-center gap-3 cursor-pointer" onClick={() => setActiveTab('dashboard')}>
@@ -271,6 +291,7 @@ export default function AppLayout({ onLogout, userName, userId }: { onLogout: ()
           </div>
         </nav>
       </main>
+      </div>
     </div>
   );
 }

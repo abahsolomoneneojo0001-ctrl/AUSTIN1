@@ -600,3 +600,65 @@ body {
     padding: 1rem;
   }
 }
+
+/* ========== BRAND INFORMATION STYLES ========== */
+
+/* Logo Text Wrapper - for brand name and tagline */
+.logo-text-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.logo-text-wrapper span:first-child {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #1A2B4A;
+  line-height: 1.2;
+  font-family: 'Barlow Condensed', sans-serif;
+  letter-spacing: 0.05em;
+}
+
+.logo-text-wrapper span:last-child {
+  font-size: 0.625rem;
+  color: #6B7E99;
+  line-height: 1.2;
+  font-weight: 400;
+  font-family: 'Barlow', sans-serif;
+}
+
+/* Dropdown Section Info - for additional details */
+.dropdown-section-info {
+  padding: 0.75rem 0.75rem;
+  background-color: #F5F9F8;
+  border-radius: 8px;
+  margin-top: 0.5rem;
+}
+
+.dropdown-section-info p {
+  font-size: 0.875rem;
+  color: #6B7E99;
+  margin: 0.25rem 0;
+  font-family: 'Barlow', sans-serif;
+  line-height: 1.4;
+}
+
+.dropdown-section-info p:first-child {
+  margin-top: 0;
+}
+
+.dropdown-section-info p:last-child {
+  margin-bottom: 0;
+}
+
+/* Responsive adjustments for brand logo */
+@media (max-width: 768px) {
+  .logo-text-wrapper {
+    display: none;
+  }
+
+  .navbar-logo img {
+    height: 2rem;
+  }
+}
+
