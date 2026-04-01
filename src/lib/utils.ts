@@ -6,6 +6,14 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export function normalizeTimestamp(ts: any): number {
+  if (!ts) return Date.now();
+  if (typeof ts.toMillis === 'function') return ts.toMillis();
+  if (typeof ts.toDate === 'function') return ts.toDate().getTime();
+  if (typeof ts === 'number') return ts;
+  return Date.now();
+}
+
 export function calculateStrictStreak(logs: string[]) {
   if (!logs || logs.length === 0) return 0;
   

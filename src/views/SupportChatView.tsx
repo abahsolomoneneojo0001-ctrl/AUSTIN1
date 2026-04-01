@@ -25,14 +25,15 @@ export default function SupportChatView() {
     if (!userId) return;
 
     setLoading(true);
+    const unsubscribers: Array<() => void> = [];
 
-    // Listen to messages where user is sender or receiver
+    // Listen to messages where user is receiver
     const q = query(
       collection(db, 'messages'),
       where('to', '==', userId)
     );
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    const unsubscribe1 = onSnapshot(q, (snapshot) => {
       const msgData: Message[] = [];
       snapshot.forEach((doc) => {
         msgData.push({
@@ -56,15 +57,26 @@ export default function SupportChatView() {
         });
 
         // Sort by timestamp
-        msgData.sort((a, b) => a.timestamp?.toMillis?.() - b.timestamp?.toMillis?.());
+        msgData.sort((a, b) => (a.timestamp?.toMillis?.() || 0) - (b.timestamp?.toMillis?.() || 0));
         setMessages(msgData);
+        setLoading(false);
+      }, (error) => {
+        console.error("Error fetching sent messages:", error);
         setLoading(false);
       });
 
-      return unsubscribe2;
+      unsubscribers.push(unsubscribe2);
+    }, (error) => {
+      console.error("Error fetching received messages:", error);
+      setLoading(false);
     });
 
-    return unsubscribe;
+    unsubscribers.push(unsubscribe1);
+
+    // Cleanup: unsubscribe from all listeners
+    return () => {
+      unsubscribers.forEach(unsub => unsub());
+    };
   }, [userId]);
 
   useEffect(() => {

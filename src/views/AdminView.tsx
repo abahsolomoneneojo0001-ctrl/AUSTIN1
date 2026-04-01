@@ -59,7 +59,7 @@ export default function AdminView({ onLogout }: { onLogout: () => void }) {
         return {
           uid: doc.id,
           ...data,
-          status: data.status || (data.stats?.totalWorkouts! > 0 ? 'ACTIVE' : 'INACTIVE')
+          status: data.status || ((data.stats?.totalWorkouts ?? 0) > 0 ? 'ACTIVE' : 'INACTIVE')
         };
       }) as UserData[];
       setUsers(usersData);

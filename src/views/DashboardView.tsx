@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Flame, Target, Zap, ChevronRight, Activity, Trophy, CheckCircle2, Calendar, ChevronDown, ChevronUp, Dumbbell, Utensils, Loader2, Sparkles } from 'lucide-react';
-import { cn, calculateStrictStreak } from '../lib/utils';
+import { cn, calculateStrictStreak, normalizeTimestamp } from '../lib/utils';
 import { db, auth, handleFirestoreError, OperationType } from '../lib/firebase';
 import { collection, query, where, getDocs, onSnapshot, addDoc, serverTimestamp, doc, updateDoc, increment } from 'firebase/firestore';
 import { format, isWithinInterval, parseISO, startOfDay, endOfDay } from 'date-fns';
@@ -45,14 +45,6 @@ export default function DashboardView({ onNavigate, userName = "Jacob", userId }
 
       setStreak(calculateStrictStreak(logs));
 
-      const normalizeTimestamp = (ts: any) => {
-        if (!ts) return Date.now();
-        if (typeof ts.toMillis === 'function') return ts.toMillis();
-        if (typeof ts.toDate === 'function') return ts.toDate().getTime();
-        if (typeof ts === 'number') return ts;
-        return Date.now();
-      };
-
       const workoutDocs = snapshot.docs.map(doc => {
         const data = doc.data();
         return {
@@ -73,14 +65,6 @@ export default function DashboardView({ onNavigate, userName = "Jacob", userId }
 
     const qMeals = query(collection(db, 'meals'), where('userId', '==', userId));
     const mealsUnsub = onSnapshot(qMeals, (snapshot) => {
-      const normalizeTimestamp = (ts: any) => {
-        if (!ts) return Date.now();
-        if (typeof ts.toMillis === 'function') return ts.toMillis();
-        if (typeof ts.toDate === 'function') return ts.toDate().getTime();
-        if (typeof ts === 'number') return ts;
-        return Date.now();
-      };
-
       const mealDocs = snapshot.docs.map(doc => {
         const data = doc.data();
         return {

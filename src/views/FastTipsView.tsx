@@ -10,15 +10,17 @@ export default function FastTipsView() {
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const getTip = async () => {
-    if (!query) return;
+  const getTip = async (prompt?: string) => {
+    const promptToUse = prompt || query;
+    if (!promptToUse) return;
 
+    setQuery(promptToUse);
     setIsGenerating(true);
     setError(null);
     setResult(null);
 
     try {
-      const response = await askFitnessCoach(`Provide a quick, actionable fitness tip or answer regarding: ${query}. Keep it under 3 sentences.`);
+      const response = await askFitnessCoach(`Provide a quick, actionable fitness tip or answer regarding: ${promptToUse}. Keep it under 3 sentences.`);
       setResult(response);
     } catch (err: any) {
       console.error("Tip generation failed:", err);
@@ -74,11 +76,7 @@ export default function FastTipsView() {
             {quickPrompts.map((p, i) => (
               <button
                 key={i}
-                onClick={() => {
-                  setQuery(p);
-                  // Need to wait for state update before calling getTip, or just pass it directly
-                  // For simplicity, we'll just set it and let user click send
-                }}
+                onClick={() => getTip(p)}
                 className="text-xs bg-ff-surface hover:bg-ff-surface/80 text-ff-muted hover:text-white px-3 py-2 rounded-full transition-colors border border-ff-surface hover:border-[#FBBC05]/50"
               >
                 {p}

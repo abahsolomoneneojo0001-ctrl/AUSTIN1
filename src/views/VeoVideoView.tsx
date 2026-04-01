@@ -65,8 +65,8 @@ export default function VeoVideoView() {
       }
 
       // Create a new client right before the call to get the latest key
-      const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
-      if (!apiKey) throw new Error("API key is missing.");
+      const apiKey = (import.meta.env as any).VITE_GEMINI_API_KEY;
+      if (!apiKey) throw new Error("API key is missing. Please check your .env file.");
       
       const ai = new GoogleGenAI({ apiKey });
       

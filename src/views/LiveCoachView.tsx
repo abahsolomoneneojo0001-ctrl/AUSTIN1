@@ -19,8 +19,8 @@ export default function LiveCoachView() {
     setError(null);
 
     try {
-      const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
-      if (!apiKey) throw new Error("Gemini API key is missing");
+      const apiKey = (import.meta.env as any).VITE_GEMINI_API_KEY;
+      if (!apiKey) throw new Error("Gemini API key is missing. Please check your .env file.");
 
       const ai = new GoogleGenAI({ apiKey });
 

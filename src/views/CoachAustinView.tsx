@@ -37,14 +37,20 @@ export default function CoachAustinView() {
       setLoadingSlots(true);
       const targetDate = format(addDays(new Date(), selectedDate), 'yyyy-MM-dd');
       fetch(`/api/coach/availability?date=${targetDate}`)
-        .then(res => res.json())
+        .then(res => {
+          if (!res.ok) {
+            throw new Error(`Failed to fetch availability: ${res.status} ${res.statusText}`);
+          }
+          return res.json();
+        })
         .then(data => {
-          setSlots(data.slots);
+          setSlots(data.slots || []);
           setLoadingSlots(false);
           setSelectedSlot(null);
         })
         .catch(err => {
-          console.error(err);
+          console.error("Error fetching coach availability:", err);
+          setSlots([]);
           setLoadingSlots(false);
         });
     }
