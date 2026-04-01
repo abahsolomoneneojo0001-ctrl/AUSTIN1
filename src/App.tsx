@@ -26,14 +26,17 @@ export default function App() {
           // Create user doc if it doesn't exist
           const userRef = doc(db, 'users', firebaseUser.uid);
           const userSnap = await getDoc(userRef);
-          
+
           if (!userSnap.exists()) {
+            // Check if this is the admin account
+            const isAdmin = firebaseUser.email === 'admin@gmail.com';
+
             await setDoc(userRef, {
               uid: firebaseUser.uid,
               name: firebaseUser.displayName || 'User',
               email: firebaseUser.email,
               photoURL: firebaseUser.photoURL || '',
-              role: 'user',
+              role: isAdmin ? 'admin' : 'user',
               stats: {
                 totalWorkouts: 0,
                 totalMinutes: 0,
@@ -61,21 +64,43 @@ export default function App() {
         try {
           const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
           console.log('User doc exists:', userDoc.exists());
+
+          // Check if this is the admin account
+          const isAdmin = firebaseUser.email === 'admin@gmail.com';
+
           if (userDoc.exists()) {
             const userData = userDoc.data();
             console.log('User data:', userData);
             setUser({
               email: userData.email || firebaseUser.email || '',
-              role: userData.role || 'user',
+              role: userData.role || (isAdmin ? 'admin' : 'user'),
               name: userData.name || firebaseUser.displayName || 'User',
               uid: firebaseUser.uid
             });
           } else {
-            // Fallback if doc doesn't exist yet
-            console.log('Using fallback user data');
+            // Fallback if doc doesn't exist yet - create it
+            console.log('User doc not found, creating one');
+            const userRef = doc(db, 'users', firebaseUser.uid);
+            await setDoc(userRef, {
+              uid: firebaseUser.uid,
+              name: firebaseUser.displayName || 'User',
+              email: firebaseUser.email,
+              photoURL: firebaseUser.photoURL || '',
+              role: isAdmin ? 'admin' : 'user',
+              stats: {
+                totalWorkouts: 0,
+                totalMinutes: 0,
+                caloriesBurned: 0
+              },
+              connectedApps: {
+                appleHealth: false,
+                googleFit: false
+              },
+              createdAt: serverTimestamp()
+            });
             setUser({
               email: firebaseUser.email || '',
-              role: 'user',
+              role: isAdmin ? 'admin' : 'user',
               name: firebaseUser.displayName || 'User',
               uid: firebaseUser.uid
             });
