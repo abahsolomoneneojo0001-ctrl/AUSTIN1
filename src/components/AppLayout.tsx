@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Home, 
-  Dumbbell, 
-  Apple, 
-  LineChart, 
+import {
+  Home,
+  Dumbbell,
+  Apple,
+  LineChart,
   BotMessageSquare,
   User,
   Settings,
@@ -14,7 +14,8 @@ import {
   Sparkles,
   Loader2,
   Sun,
-  Moon
+  Moon,
+  MessageCircle
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { db, handleFirestoreError, OperationType } from '../lib/firebase';
@@ -27,8 +28,9 @@ import AICoachView from '../views/AICoachView';
 import CoachAustinView from '../views/CoachAustinView';
 import AIHubView from '../views/AIHubView';
 import ProfileSetupView from '../views/ProfileSetupView';
+import SupportChatView from '../views/SupportChatView';
 
-type Tab = 'dashboard' | 'workouts' | 'nutrition' | 'progress' | 'coaches' | 'coach' | 'ai-hub' | 'premium' | 'profile';
+type Tab = 'dashboard' | 'workouts' | 'nutrition' | 'progress' | 'coaches' | 'coach' | 'ai-hub' | 'support' | 'premium' | 'profile';
 
 export default function AppLayout({ onLogout, userName, userId }: { onLogout: () => void, userName: string, userId?: string }) {
   const [activeTab, setActiveTab] = useState<Tab>('dashboard');
@@ -100,6 +102,7 @@ export default function AppLayout({ onLogout, userName, userId }: { onLogout: ()
     { id: 'progress', label: 'Progress', icon: LineChart },
     { id: 'coaches', label: '1-on-1 Coaching', icon: Users },
     { id: 'ai-hub', label: 'AI Innovation Hub', icon: Sparkles },
+    { id: 'support', label: 'Support Chat', icon: MessageCircle },
   ] as const;
 
   const renderContent = () => {
@@ -110,6 +113,7 @@ export default function AppLayout({ onLogout, userName, userId }: { onLogout: ()
       case 'progress': return <ProgressView />;
       case 'coaches': return <CoachAustinView />;
       case 'ai-hub': return <AIHubView />;
+      case 'support': return <SupportChatView />;
       case 'profile': return <ProfileSetupView onComplete={() => setActiveTab('dashboard')} />;
       default: return <DashboardView onNavigate={setActiveTab} userName={userName} userId={userId} />;
     }
