@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Calendar, Activity, LogOut, TrendingUp, Search, MessageSquare, Trash2, Shield, Send, X } from 'lucide-react';
+import { Users, MessageSquare, BarChart3, Settings, LogOut, Search, Filter, Trash2, Shield, Send, X } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { db } from '../lib/firebase';
 import { collection, query, where, getDocs, doc, updateDoc, addDoc, serverTimestamp, deleteDoc } from 'firebase/firestore';
@@ -15,6 +15,7 @@ interface UserData {
     caloriesBurned: number;
   };
   createdAt: any;
+  status?: 'ACTIVE' | 'INACTIVE' | 'BANNED';
 }
 
 interface Message {
@@ -27,14 +28,15 @@ interface Message {
 }
 
 export default function AdminView({ onLogout }: { onLogout: () => void }) {
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState('users');
   const [users, setUsers] = useState<UserData[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'All' | 'Active' | 'Inactive'>('All');
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [messageInput, setMessageInput] = useState('');
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({ totalUsers: 0, activeToday: 0, premiumUsers: 0 });
+  const [stats, setStats] = useState({ totalUsers: 0, activeUsers: 0, bannedUsers: 0 });
 
   useEffect(() => {
     fetchUsers();
@@ -52,15 +54,19 @@ export default function AdminView({ onLogout }: { onLogout: () => void }) {
       const usersRef = collection(db, 'users');
       const q = query(usersRef, where('role', '==', 'user'));
       const snapshot = await getDocs(q);
-      const usersData = snapshot.docs.map(doc => ({
-        uid: doc.id,
-        ...doc.data()
-      })) as UserData[];
+      const usersData = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          uid: doc.id,
+          ...data,
+          status: data.status || (data.stats?.totalWorkouts! > 0 ? 'ACTIVE' : 'INACTIVE')
+        };
+      }) as UserData[];
       setUsers(usersData);
       setStats({
         totalUsers: usersData.length,
-        activeToday: usersData.filter(u => u.stats?.totalWorkouts! > 0).length,
-        premiumUsers: Math.floor(usersData.length * 0.6)
+        activeUsers: usersData.filter(u => u.status === 'ACTIVE').length,
+        bannedUsers: usersData.filter(u => u.status === 'BANNED').length
       });
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -110,63 +116,77 @@ export default function AdminView({ onLogout }: { onLogout: () => void }) {
       await deleteDoc(doc(db, 'users', userId));
       setUsers(users.filter(u => u.uid !== userId));
       setSelectedUser(null);
+      fetchUsers();
     } catch (error) {
       console.error("Error deleting user:", error);
     }
   };
 
-  const updateUserRole = async (userId: string, newRole: string) => {
+  const updateUserStatus = async (userId: string, newStatus: 'ACTIVE' | 'INACTIVE' | 'BANNED') => {
     try {
-      await updateDoc(doc(db, 'users', userId), { role: newRole });
-      const updated = users.map(u => u.uid === userId ? { ...u, role: newRole } : u);
+      await updateDoc(doc(db, 'users', userId), { status: newStatus });
+      const updated = users.map(u => u.uid === userId ? { ...u, status: newStatus } : u);
       setUsers(updated);
       if (selectedUser?.uid === userId) {
-        setSelectedUser({ ...selectedUser, role: newRole });
+        setSelectedUser({ ...selectedUser, status: newStatus });
       }
+      fetchUsers();
     } catch (error) {
-      console.error("Error updating user role:", error);
+      console.error("Error updating user status:", error);
     }
   };
 
-  const filteredUsers = users.filter(u =>
-    u.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    u.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredUsers = users.filter(u => {
+    const matchesSearch = u.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      u.name.toLowerCase().includes(searchTerm.toLowerCase());
+
+    if (statusFilter === 'All') return matchesSearch;
+    if (statusFilter === 'Active') return matchesSearch && u.status === 'ACTIVE';
+    if (statusFilter === 'Inactive') return matchesSearch && (u.status === 'INACTIVE' || u.status === 'BANNED');
+    return matchesSearch;
+  });
+
+  const getStatusColor = (status?: string) => {
+    if (status === 'ACTIVE') return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
+    if (status === 'BANNED') return 'bg-red-500/20 text-red-400 border-red-500/30';
+    return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+  };
 
   return (
-    <div className="min-h-[100dvh] bg-ff-bg text-ff-text font-sans flex flex-col md:flex-row">
+    <div className="min-h-[100dvh] bg-gray-950 text-white font-sans flex">
       {/* Sidebar */}
-      <aside className="w-full md:w-64 bg-ff-surface border-r border-ff-surface p-6 flex flex-col">
-        <div className="flex items-center gap-3 mb-12">
-          <div className="w-10 h-10 rounded-xl bg-ff-primary flex items-center justify-center">
-            <Activity className="w-5 h-5 text-black" />
-          </div>
-          <span className="text-2xl font-display tracking-wider text-ff-text">FWA ADMIN</span>
+      <aside className="w-64 bg-black border-r border-gray-800 p-8 flex flex-col">
+        <div className="mb-12">
+          <h1 className="text-2xl font-bold text-emerald-400">AUSTIN</h1>
+          <p className="text-xs text-gray-500 uppercase tracking-widest mt-1">Admin Panel</p>
         </div>
 
         <nav className="flex-1 space-y-2">
           {[
-            { id: 'dashboard', label: 'Overview', icon: TrendingUp },
             { id: 'users', label: 'Users', icon: Users },
             { id: 'messages', label: 'Messages', icon: MessageSquare },
+            { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+            { id: 'settings', label: 'Settings', icon: Settings },
           ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all",
-                activeTab === tab.id ? "bg-ff-primary text-black" : "text-ff-muted hover:text-ff-text hover:bg-ff-surface"
+                "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all text-left",
+                activeTab === tab.id
+                  ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                  : "text-gray-400 hover:text-gray-200 hover:bg-gray-900/50"
               )}
             >
               <tab.icon className="w-5 h-5" />
-              {tab.label}
+              <span className="font-medium">{tab.label}</span>
             </button>
           ))}
         </nav>
 
         <button
           onClick={onLogout}
-          className="mt-auto w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-red-500 hover:bg-red-500/10 transition-all"
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-red-400 hover:bg-red-500/10 transition-all"
         >
           <LogOut className="w-5 h-5" />
           Sign Out
@@ -175,137 +195,145 @@ export default function AdminView({ onLogout }: { onLogout: () => void }) {
 
       {/* Main Content */}
       <main className="flex-1 p-8 overflow-y-auto">
-        {/* Dashboard Tab */}
-        {activeTab === 'dashboard' && (
-          <>
-            <header className="mb-12">
-              <h1 className="text-4xl font-display tracking-wide text-ff-text mb-2">Admin Dashboard</h1>
-              <p className="text-ff-muted">Manage your users, interactions, and app metrics.</p>
-            </header>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-              {[
-                { label: 'Total Users', value: stats.totalUsers, change: '+12% this month' },
-                { label: 'Active Today', value: stats.activeToday, change: 'Last 24 hours' },
-                { label: 'Premium Users', value: stats.premiumUsers, change: '+5% this month' },
-              ].map((stat, i) => (
-                <div key={i} className="bg-ff-surface p-6 rounded-2xl border border-ff-surface">
-                  <p className="text-sm text-ff-muted font-bold uppercase tracking-wider mb-2">{stat.label}</p>
-                  <p className="text-4xl font-mono font-bold text-ff-text mb-2">{stat.value}</p>
-                  <p className="text-sm text-ff-primary font-bold">{stat.change}</p>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-
         {/* Users Tab */}
         {activeTab === 'users' && (
           <div>
-            <header className="flex justify-between items-center mb-8">
-              <div>
-                <h1 className="text-4xl font-display tracking-wide text-ff-text mb-2">Users Management</h1>
-                <p className="text-ff-muted">View and manage all users in the system.</p>
-              </div>
-              <div className="relative w-64">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-ff-muted" />
+            <div className="mb-8">
+              <h1 className="text-4xl font-bold mb-2">User Management</h1>
+              <p className="text-gray-400">Manage, message, and moderate users</p>
+            </div>
+
+            {/* Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              {[
+                { label: 'Total Users', value: stats.totalUsers, icon: '👥', color: 'text-emerald-400' },
+                { label: 'Active', value: stats.activeUsers, icon: '✓', color: 'text-emerald-400' },
+                { label: 'Banned', value: stats.bannedUsers, icon: '⛔', color: 'text-red-400' },
+              ].map((stat, i) => (
+                <div key={i} className="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-gray-500 uppercase text-xs tracking-widest font-bold">{stat.label}</p>
+                    <span className="text-2xl">{stat.icon}</span>
+                  </div>
+                  <p className={cn("text-3xl font-bold", stat.color)}>{stat.value}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Filter & Search */}
+            <div className="flex gap-4 mb-6">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
                 <input
                   type="text"
-                  placeholder="Search users..."
+                  placeholder="Search users by name or email..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full bg-ff-surface border border-ff-surface rounded-xl py-2.5 pl-10 pr-4 text-ff-text placeholder:text-ff-muted focus:outline-none focus:border-ff-primary focus:ring-1 focus:ring-ff-primary transition-all"
+                  className="w-full bg-gray-900/50 border border-gray-800 rounded-lg py-3 pl-10 pr-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all"
                 />
               </div>
-            </header>
+              <div className="flex gap-2">
+                {['All', 'Active', 'Inactive'].map((filter) => (
+                  <button
+                    key={filter}
+                    onClick={() => setStatusFilter(filter as any)}
+                    className={cn(
+                      "px-6 py-3 rounded-lg font-medium transition-all border",
+                      statusFilter === filter
+                        ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
+                        : "bg-gray-900/50 text-gray-400 border-gray-800 hover:border-gray-700"
+                    )}
+                  >
+                    {filter}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Users Table */}
-              <div className="lg:col-span-2 bg-ff-surface rounded-2xl border border-ff-surface overflow-hidden">
-                <div className="p-6 border-b border-ff-surface">
-                  <h2 className="text-xl font-display tracking-wide text-ff-text">All Users ({filteredUsers.length})</h2>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left">
-                    <thead className="bg-ff-surface/50 text-xs uppercase tracking-wider text-ff-muted font-bold">
-                      <tr>
-                        <th className="px-6 py-4">User</th>
-                        <th className="px-6 py-4">Workouts</th>
-                        <th className="px-6 py-4">Joined</th>
-                        <th className="px-6 py-4">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-ff-surface">
-                      {filteredUsers.map((user) => (
-                        <tr key={user.uid} className="hover:bg-ff-surface/30 transition-colors">
-                          <td className="px-6 py-4">
-                            <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-ff-primary to-ff-quaternary flex items-center justify-center text-black font-bold text-xs">
-                                {user.name.split(' ').map(n => n[0]).join('')}
-                              </div>
-                              <div>
-                                <p className="font-bold text-ff-text">{user.name}</p>
-                                <p className="text-xs text-ff-muted">{user.email}</p>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 font-mono font-bold text-ff-text">{user.stats?.totalWorkouts || 0}</td>
-                          <td className="px-6 py-4 text-sm text-ff-muted">{user.createdAt?.toDate?.()?.toLocaleDateString() || 'N/A'}</td>
-                          <td className="px-6 py-4">
-                            <button
-                              onClick={() => setSelectedUser(user)}
-                              className="text-sm font-bold text-ff-primary hover:text-ff-text transition-colors"
-                            >
-                              View
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+            {/* Users Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Users List */}
+              <div className="lg:col-span-2 space-y-3 max-h-[600px] overflow-y-auto pr-2">
+                {filteredUsers.map((user) => (
+                  <div
+                    key={user.uid}
+                    onClick={() => setSelectedUser(user)}
+                    className={cn(
+                      "bg-gray-900/50 border rounded-xl p-4 cursor-pointer transition-all hover:border-emerald-500/50",
+                      selectedUser?.uid === user.uid ? "border-emerald-500/50 bg-emerald-500/5" : "border-gray-800"
+                    )}
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex items-center gap-4 flex-1">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-sm font-bold text-black">
+                          {user.name.split(' ').map(n => n[0]).join('')}
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-bold text-white">{user.name}</p>
+                          <p className="text-sm text-gray-400">{user.email}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className={cn("px-3 py-1 rounded-full text-xs font-bold border uppercase", getStatusColor(user.status))}>
+                          {user.status || 'INACTIVE'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
 
               {/* User Details Panel */}
               {selectedUser && (
-                <div className="bg-ff-surface rounded-2xl border border-ff-surface p-6 h-fit sticky top-8">
+                <div className="bg-gray-900/50 border border-gray-800 rounded-xl p-6 h-fit sticky top-8">
                   <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-xl font-display tracking-wide text-ff-text">User Details</h3>
-                    <button onClick={() => setSelectedUser(null)} className="text-ff-muted hover:text-ff-text">
+                    <h3 className="text-xl font-bold">User Details</h3>
+                    <button onClick={() => setSelectedUser(null)} className="text-gray-400 hover:text-white">
                       <X className="w-5 h-5" />
                     </button>
                   </div>
 
                   <div className="space-y-4 mb-6">
                     <div>
-                      <p className="text-xs text-ff-muted uppercase font-bold mb-2">Name</p>
-                      <p className="font-bold text-ff-text">{selectedUser.name}</p>
+                      <p className="text-xs text-gray-500 uppercase font-bold mb-2">Name</p>
+                      <p className="font-bold text-white">{selectedUser.name}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-ff-muted uppercase font-bold mb-2">Email</p>
-                      <p className="font-mono text-sm text-ff-text">{selectedUser.email}</p>
+                      <p className="text-xs text-gray-500 uppercase font-bold mb-2">Email</p>
+                      <p className="font-mono text-sm text-gray-300">{selectedUser.email}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-ff-muted uppercase font-bold mb-2">Total Workouts</p>
-                      <p className="font-bold text-ff-text">{selectedUser.stats?.totalWorkouts || 0}</p>
+                      <p className="text-xs text-gray-500 uppercase font-bold mb-2">Workouts</p>
+                      <p className="font-bold text-emerald-400">{selectedUser.stats?.totalWorkouts || 0}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-ff-muted uppercase font-bold mb-2">Total Minutes</p>
-                      <p className="font-bold text-ff-text">{selectedUser.stats?.totalMinutes || 0}</p>
+                      <p className="text-xs text-gray-500 uppercase font-bold mb-2">Status</p>
+                      <p className={cn("font-bold uppercase text-sm", selectedUser.status === 'ACTIVE' ? 'text-emerald-400' : 'text-gray-400')}>
+                        {selectedUser.status || 'INACTIVE'}
+                      </p>
                     </div>
                   </div>
 
-                  <div className="space-y-2 mb-6">
-                    <button
-                      onClick={() => updateUserRole(selectedUser.uid, 'premium')}
-                      className="w-full flex items-center justify-center gap-2 bg-ff-primary text-black py-2 rounded-lg font-bold hover:bg-ff-primary/90 transition-colors"
-                    >
-                      <Shield className="w-4 h-4" />
-                      Mark as Premium
-                    </button>
+                  <div className="space-y-2 border-t border-gray-800 pt-4">
+                    {selectedUser.status !== 'ACTIVE' && (
+                      <button
+                        onClick={() => updateUserStatus(selectedUser.uid, 'ACTIVE')}
+                        className="w-full px-4 py-2 bg-emerald-500/20 text-emerald-400 rounded-lg font-bold hover:bg-emerald-500/30 transition-all border border-emerald-500/30 text-sm"
+                      >
+                        Activate User
+                      </button>
+                    )}
+                    {selectedUser.status !== 'BANNED' && (
+                      <button
+                        onClick={() => updateUserStatus(selectedUser.uid, 'BANNED')}
+                        className="w-full px-4 py-2 bg-red-500/20 text-red-400 rounded-lg font-bold hover:bg-red-500/30 transition-all border border-red-500/30 text-sm"
+                      >
+                        Ban User
+                      </button>
+                    )}
                     <button
                       onClick={() => deleteUser(selectedUser.uid)}
-                      className="w-full flex items-center justify-center gap-2 bg-red-500/10 text-red-500 py-2 rounded-lg font-bold hover:bg-red-500/20 transition-colors"
+                      className="w-full px-4 py-2 bg-red-500/10 text-red-500 rounded-lg font-bold hover:bg-red-500/20 transition-all border border-red-500/20 text-sm flex items-center justify-center gap-2"
                     >
                       <Trash2 className="w-4 h-4" />
                       Delete User
@@ -320,29 +348,29 @@ export default function AdminView({ onLogout }: { onLogout: () => void }) {
         {/* Messages Tab */}
         {activeTab === 'messages' && (
           <div>
-            <header className="mb-8">
-              <h1 className="text-4xl font-display tracking-wide text-ff-text mb-2">User Messages</h1>
-              <p className="text-ff-muted">Send messages and announcements to users.</p>
-            </header>
+            <div className="mb-8">
+              <h1 className="text-4xl font-bold mb-2">Messages</h1>
+              <p className="text-gray-400">Send messages to users</p>
+            </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Users List */}
-              <div className="lg:col-span-1 bg-ff-surface rounded-2xl border border-ff-surface overflow-hidden">
-                <div className="p-6 border-b border-ff-surface">
-                  <h2 className="text-xl font-display tracking-wide text-ff-text">Users</h2>
+              <div className="bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden flex flex-col">
+                <div className="p-4 border-b border-gray-800">
+                  <h3 className="font-bold">Users</h3>
                 </div>
-                <div className="overflow-y-auto max-h-[600px]">
+                <div className="flex-1 overflow-y-auto">
                   {users.map((user) => (
                     <button
                       key={user.uid}
                       onClick={() => setSelectedUser(user)}
                       className={cn(
-                        "w-full text-left px-6 py-4 border-b border-ff-surface/50 hover:bg-ff-surface/30 transition-colors",
-                        selectedUser?.uid === user.uid ? "bg-ff-primary/10 border-l-2 border-ff-primary" : ""
+                        "w-full text-left px-4 py-3 border-b border-gray-800/50 hover:bg-gray-800/50 transition-colors",
+                        selectedUser?.uid === user.uid ? "bg-emerald-500/10 border-l-2 border-l-emerald-400" : ""
                       )}
                     >
-                      <p className="font-bold text-ff-text text-sm">{user.name}</p>
-                      <p className="text-xs text-ff-muted">{user.email}</p>
+                      <p className="font-bold text-sm text-white">{user.name}</p>
+                      <p className="text-xs text-gray-400">{user.email}</p>
                     </button>
                   ))}
                 </div>
@@ -350,59 +378,66 @@ export default function AdminView({ onLogout }: { onLogout: () => void }) {
 
               {/* Messages Panel */}
               {selectedUser ? (
-                <div className="lg:col-span-2 bg-ff-surface rounded-2xl border border-ff-surface overflow-hidden flex flex-col h-[600px]">
-                  <div className="p-6 border-b border-ff-surface">
-                    <h2 className="text-xl font-display tracking-wide text-ff-text">Messages with {selectedUser.name}</h2>
+                <div className="lg:col-span-2 bg-gray-900/50 border border-gray-800 rounded-xl overflow-hidden flex flex-col h-[600px]">
+                  <div className="p-4 border-b border-gray-800">
+                    <h3 className="font-bold">Message {selectedUser.name}</h3>
                   </div>
 
-                  <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                  <div className="flex-1 overflow-y-auto p-4 space-y-4">
                     {messages.length === 0 ? (
-                      <p className="text-ff-muted text-center py-8">No messages yet. Start a conversation!</p>
+                      <p className="text-gray-500 text-center py-8">No messages yet</p>
                     ) : (
                       messages.map((msg) => (
                         <div key={msg.id} className={cn("flex gap-3", msg.from === 'admin' ? 'flex-row-reverse' : '')}>
                           <div className={cn(
-                            "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0",
-                            msg.from === 'admin' ? "bg-ff-primary text-black" : "bg-ff-surface/50"
+                            "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white",
+                            msg.from === 'admin' ? "bg-emerald-500" : "bg-gray-700"
                           )}>
                             {msg.from === 'admin' ? 'A' : 'U'}
                           </div>
                           <div className={cn(
-                            "max-w-[70%] p-3 rounded-lg",
+                            "max-w-xs px-4 py-2 rounded-lg text-sm",
                             msg.from === 'admin'
-                              ? "bg-ff-primary/20 text-ff-text rounded-br-none"
-                              : "bg-ff-surface text-ff-text rounded-bl-none"
+                              ? "bg-emerald-500/20 text-emerald-100"
+                              : "bg-gray-800 text-gray-100"
                           )}>
-                            <p className="text-sm">{msg.content}</p>
+                            {msg.content}
                           </div>
                         </div>
                       ))
                     )}
                   </div>
 
-                  <form onSubmit={sendMessage} className="border-t border-ff-surface p-4 flex gap-3">
+                  <form onSubmit={sendMessage} className="border-t border-gray-800 p-4 flex gap-2">
                     <input
                       type="text"
                       value={messageInput}
                       onChange={(e) => setMessageInput(e.target.value)}
                       placeholder="Type a message..."
-                      className="flex-1 bg-ff-bg border border-ff-surface rounded-lg px-4 py-2 text-ff-text placeholder:text-ff-muted focus:outline-none focus:border-ff-primary transition-all"
+                      className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder:text-gray-500 focus:outline-none focus:border-emerald-500/50 transition-all"
                     />
                     <button
                       type="submit"
                       disabled={!messageInput.trim()}
-                      className="bg-ff-primary text-black p-2 rounded-lg hover:bg-ff-primary/90 disabled:opacity-50 transition-all"
+                      className="bg-emerald-500 text-white p-2 rounded-lg hover:bg-emerald-600 disabled:opacity-50 transition-all"
                     >
                       <Send className="w-5 h-5" />
                     </button>
                   </form>
                 </div>
               ) : (
-                <div className="lg:col-span-2 bg-ff-surface rounded-2xl border border-ff-surface p-8 flex items-center justify-center h-[600px]">
-                  <p className="text-ff-muted text-center">Select a user to start messaging</p>
+                <div className="lg:col-span-2 bg-gray-900/50 border border-gray-800 rounded-xl p-8 flex items-center justify-center h-[600px]">
+                  <p className="text-gray-500">Select a user to start messaging</p>
                 </div>
               )}
             </div>
+          </div>
+        )}
+
+        {/* Analytics & Settings (Placeholder) */}
+        {(activeTab === 'analytics' || activeTab === 'settings') && (
+          <div className="text-center py-12">
+            <p className="text-gray-400 text-lg">Coming soon...</p>
           </div>
         )}
       </main>
