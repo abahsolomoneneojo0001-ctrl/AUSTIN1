@@ -32,6 +32,34 @@ const BRAND_INFO = {
   }
 };
 
+// Website Content
+const WEBSITE_CONTENT = {
+  hero: {
+    headline: 'Transform Your Body. Elevate Your Mind.',
+    subtext: 'At FitWithAustin, fitness is more than workouts — it\'s a lifestyle. Whether you\'re starting your journey or pushing toward new goals, we\'re here to guide, motivate, and celebrate every step with you.'
+  },
+  about: {
+    story: 'Founded by Austin, a passionate trainer dedicated to holistic health, FitWithAustin was built to inspire people to move, eat well, and live fully. We believe fitness should be accessible, enjoyable, and empowering.',
+    mission: 'To create a supportive community where individuals achieve their best selves through personalized training, nutrition guidance, and motivation.'
+  },
+  trainings: {
+    personal: 'One-on-one sessions tailored to your goals, from weight loss to strength building.',
+    group: 'High-energy workouts designed to keep you motivated and connected.',
+    functional: 'Improve mobility, endurance, and everyday strength with dynamic routines.'
+  },
+  memberships: {
+    basic: 'Access to gym facilities and group classes.',
+    premium: 'Includes personal training sessions and nutrition guidance.',
+    elite: 'Full package with unlimited classes, advanced coaching, and exclusive events.'
+  },
+  testimonials: [
+    { quote: 'Joining FitWithAustin changed my life. I\'ve lost 20 pounds and gained confidence I never thought possible.', author: 'Sarah M.' },
+    { quote: 'Austin\'s approach is motivating and practical. I feel stronger every day.', author: 'James T.' }
+  ],
+  club: 'Step inside our modern facility equipped with state-of-the-art machines, functional training zones, and a welcoming atmosphere. More than a gym — it\'s a community.',
+  contactCTA: 'Have questions or ready to start? Reach out today and let\'s build your fitness journey together.'
+};
+
 export default function NavbarDropdown({ loading = false, onLoginClick }: NavbarDropdownProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [modal, setModal] = useState<ContentModal>({
@@ -49,22 +77,64 @@ export default function NavbarDropdown({ loading = false, onLoginClick }: Navbar
       isLoading: true,
     });
 
+    // Check if this is static content or needs AI generation
+    let content = '';
+    
     try {
-      const context = `Provide detailed, actionable fitness advice about "${subtitle}". Keep it concise (2-3 paragraphs), practical, and specific.`;
-      
-      // Add timeout to prevent infinite loading
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Request timeout after 15 seconds')), 15000)
-      );
-      
-      const response = await Promise.race([
-        askFitnessCoach(context),
-        timeoutPromise
-      ]) as string;
-      
+      // Map content based on title
+      switch(title) {
+        case 'Our Story':
+          content = WEBSITE_CONTENT.about.story;
+          break;
+        case 'Our Mission':
+          content = WEBSITE_CONTENT.about.mission;
+          break;
+        case 'Strength & Conditioning':
+          content = WEBSITE_CONTENT.trainings.personal;
+          break;
+        case 'Group Classes':
+          content = WEBSITE_CONTENT.trainings.group;
+          break;
+        case 'Recovery & Mobility':
+          content = WEBSITE_CONTENT.trainings.functional;
+          break;
+        case 'Client Reviews':
+          content = WEBSITE_CONTENT.testimonials.map(t => `"${t.quote}"\n— ${t.author}`).join('\n\n');
+          break;
+        case 'Tour The Club':
+          content = WEBSITE_CONTENT.club;
+          break;
+        case 'Our Community':
+          content = WEBSITE_CONTENT.club;
+          break;
+        case 'Meet the Team':
+          // Generate AI content for this
+          const context = `Provide detailed information about "${subtitle}". Keep it concise (2-3 paragraphs), practical, and specific.`;
+          const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Request timeout after 15 seconds')), 15000)
+          );
+          const response = await Promise.race([
+            askFitnessCoach(context),
+            timeoutPromise
+          ]) as string;
+          content = response;
+          break;
+        default:
+          // Generate AI content for unmapped items
+          const aiContext = `Provide detailed, actionable fitness advice about "${subtitle}". Keep it concise (2-3 paragraphs), practical, and specific.`;
+          const aiTimeout = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Request timeout after 15 seconds')), 15000)
+          );
+          const aiResponse = await Promise.race([
+            askFitnessCoach(aiContext),
+            aiTimeout
+          ]) as string;
+          content = aiResponse;
+      }
+
       setModal(prev => ({
         ...prev,
-        content: response,
+        content: content || 'No content available',
         isLoading: false,
       }));
     } catch (error) {
@@ -255,14 +325,14 @@ export default function NavbarDropdown({ loading = false, onLoginClick }: Navbar
                   <span className="dropdown-item-icon">📖</span>
                   <div className="dropdown-item-content">
                     <p className="dropdown-item-title">Our Story</p>
-                    <p className="dropdown-item-subtitle">Learn our journey</p>
+                    <p className="dropdown-item-subtitle">Founded with passion for fitness</p>
                   </div>
                 </button>
                 <button className="dropdown-item" aria-label="Our mission statement">
                   <span className="dropdown-item-icon">🎯</span>
                   <div className="dropdown-item-content">
                     <p className="dropdown-item-title">Our Mission</p>
-                    <p className="dropdown-item-subtitle">{BRAND_INFO.tagline}</p>
+                    <p className="dropdown-item-subtitle">Build a supportive community</p>
                   </div>
                 </button>
                 <button className="dropdown-item" aria-label="Meet expert coaches and trainers">
@@ -270,13 +340,6 @@ export default function NavbarDropdown({ loading = false, onLoginClick }: Navbar
                   <div className="dropdown-item-content">
                     <p className="dropdown-item-title">Meet the Team</p>
                     <p className="dropdown-item-subtitle">Expert coaches & trainers</p>
-                  </div>
-                </button>
-                <button className="dropdown-item" aria-label="Read latest fitness announcements">
-                  <span className="dropdown-item-icon">📰</span>
-                  <div className="dropdown-item-content">
-                    <p className="dropdown-item-title">News & Updates</p>
-                    <p className="dropdown-item-subtitle">Latest announcements</p>
                   </div>
                 </button>
               </div>
@@ -302,49 +365,25 @@ export default function NavbarDropdown({ loading = false, onLoginClick }: Navbar
             <div className="dropdown-menu">
               <div className="dropdown-section">
                 <div className="dropdown-section-label">Programs</div>
-                <button className="dropdown-item" aria-label="Learn about strength and conditioning programs">
+                <button className="dropdown-item" aria-label="One-on-one sessions tailored to your goals">
                   <span className="dropdown-item-icon">💪</span>
                   <div className="dropdown-item-content">
                     <p className="dropdown-item-title">Strength & Conditioning</p>
-                    <p className="dropdown-item-subtitle">Build power and muscle</p>
+                    <p className="dropdown-item-subtitle">Weight loss to strength building</p>
                   </div>
                 </button>
-                <button className="dropdown-item" aria-label="Explore speed training programs">
-                  <span className="dropdown-item-icon">⚡</span>
-                  <div className="dropdown-item-content">
-                    <p className="dropdown-item-title">Speed Training</p>
-                    <p className="dropdown-item-subtitle">Boost your performance</p>
-                  </div>
-                </button>
-                <button className="dropdown-item" aria-label="Learn about recovery and mobility training">
-                  <span className="dropdown-item-icon">🧘</span>
-                  <div className="dropdown-item-content">
-                    <p className="dropdown-item-title">Recovery & Mobility</p>
-                    <p className="dropdown-item-subtitle">Improve flexibility & recovery</p>
-                  </div>
-                </button>
-              </div>
-              <div className="dropdown-section">
-                <div className="dropdown-section-label">Format</div>
-                <button className="dropdown-item" aria-label="Book personalized one-on-one training sessions">
-                  <span className="dropdown-item-icon">👨‍🏫</span>
-                  <div className="dropdown-item-content">
-                    <p className="dropdown-item-title">1-on-1 Sessions</p>
-                    <p className="dropdown-item-subtitle">Personalized training</p>
-                  </div>
-                </button>
-                <button className="dropdown-item" aria-label="Join group fitness classes">
+                <button className="dropdown-item" aria-label="High-energy workouts to stay motivated">
                   <span className="dropdown-item-icon">👫</span>
                   <div className="dropdown-item-content">
                     <p className="dropdown-item-title">Group Classes</p>
-                    <p className="dropdown-item-subtitle">Train with others</p>
+                    <p className="dropdown-item-subtitle">Stay motivated and connected</p>
                   </div>
                 </button>
-                <button className="dropdown-item" aria-label="Join online training programs">
-                  <span className="dropdown-item-icon">💻</span>
+                <button className="dropdown-item" aria-label="Improve mobility, endurance, and strength">
+                  <span className="dropdown-item-icon">🧘</span>
                   <div className="dropdown-item-content">
-                    <p className="dropdown-item-title">Online Programs</p>
-                    <p className="dropdown-item-subtitle">Train from anywhere</p>
+                    <p className="dropdown-item-title">Recovery & Mobility</p>
+                    <p className="dropdown-item-subtitle">Enhance flexibility & recovery</p>
                   </div>
                 </button>
               </div>
@@ -366,30 +405,53 @@ export default function NavbarDropdown({ loading = false, onLoginClick }: Navbar
                   <span className="dropdown-item-icon">⭐</span>
                   <div className="dropdown-item-content">
                     <p className="dropdown-item-title">Client Reviews</p>
-                    <p className="dropdown-item-subtitle">Read success stories</p>
+                    <p className="dropdown-item-subtitle">Real transformation stories</p>
                   </div>
                 </button>
-                <button className="dropdown-item" aria-label="View before and after transformation results">
+                <button className="dropdown-item" aria-label="See transformation results from members">
                   <span className="dropdown-item-icon">🔄</span>
                   <div className="dropdown-item-content">
-                    <p className="dropdown-item-title">Transformations</p>
-                    <p className="dropdown-item-subtitle">Before & after results</p>
+                    <p className="dropdown-item-title">Success Stories</p>
+                    <p className="dropdown-item-subtitle">See the results members achieved</p>
                   </div>
                 </button>
-                <button className="dropdown-item" aria-label="Watch client video testimonials">
-                  <span className="dropdown-item-icon">🎥</span>
+              </div>
+            </div>
+          </li>
+
+          {/* Facility */}
+          <li className="nav-item-wrapper">
+            <button className="nav-item-link" data-dropdown="facility">
+              <span>The Club</span>
+              <svg className="nav-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </button>
+            <div className="dropdown-menu">
+              <div className="dropdown-section">
+                <div className="dropdown-section-label">Our Facility</div>
+                <button className="dropdown-item" aria-label="Tour our modern gym facility">
+                  <span className="dropdown-item-icon">🏢</span>
                   <div className="dropdown-item-content">
-                    <p className="dropdown-item-title">Video Stories</p>
-                    <p className="dropdown-item-subtitle">Watch client videos</p>
+                    <p className="dropdown-item-title">Tour The Club</p>
+                    <p className="dropdown-item-subtitle">State-of-the-art equipment & zones</p>
                   </div>
                 </button>
-                <button className="dropdown-item" aria-label="Share your fitness experience with us">
-                  <span className="dropdown-item-icon">💬</span>
+                <button className="dropdown-item" aria-label="Learn about our community">
+                  <span className="dropdown-item-icon">👥</span>
                   <div className="dropdown-item-content">
-                    <p className="dropdown-item-title">Leave a Review</p>
-                    <p className="dropdown-item-subtitle">Share your experience</p>
+                    <p className="dropdown-item-title">Our Community</p>
+                    <p className="dropdown-item-subtitle">More than just a gym</p>
                   </div>
                 </button>
+              </div>
+              <div className="dropdown-section">
+                <div className="dropdown-section-label">Amenities</div>
+                <div className="dropdown-section-info">
+                  <p className="text-sm text-slate-600 mb-2">✓ Modern cardio & strength equipment</p>
+                  <p className="text-sm text-slate-600 mb-2">✓ Functional training zones</p>
+                  <p className="text-sm text-slate-600">✓ Welcoming, inclusive atmosphere</p>
+                </div>
               </div>
             </div>
           </li>
